@@ -31,6 +31,7 @@ namespace ZAws.Console
         {
             if (this.InvokeRequired)
             {
+                Debug.Assert(e.NewObject != null);
                 //Following Invoknig must be asynchronous, so not to cause deadlock with the Disconnect handler.
                 this.BeginInvoke(new EventHandler<ZAwsEc2Controller.ZAwsNewObjectEventArgs>(controller_NewObject), sender, e);
                 return;
@@ -132,7 +133,7 @@ namespace ZAws.Console
             Font AdditionalStatusFont = new Font(FontFamily.GenericSansSerif, 6, FontStyle.Italic);
             Font NameFont = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular);
 
-            Rectangle IconSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 3, 50, 25);
+            Rectangle IconSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 3, 100, 25);
             Rectangle AdditionalIconSpace = new Rectangle(e.Bounds.X + 5, e.Bounds.Y + 25, 50, 10);
             Rectangle NameSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 30, 100, 30);
 
@@ -174,14 +175,20 @@ namespace ZAws.Console
             {
                 e.Graphics.DrawString("IP", IconFont, Brushes.Blue, IconSpace);
             }
+            else if (e.Item.Tag.GetType() == typeof(ZAwsS3))
+            {
+                e.Graphics.DrawString("S3", IconFont, Brushes.Blue, IconSpace);
+            }
+            else if (e.Item.Tag.GetType() == typeof(ZAwsHostedZone))
+            {
+                e.Graphics.DrawString("DNS", IconFont, Brushes.Blue, IconSpace);
+            }
             else
             {
                 //Unknown ZAWS object
                 Debug.Assert(false, "Unknown ZAWS object");
+                throw new ArgumentException("Unknown ZAws object: " + e.Item.Tag.GetType().ToString());
             }
-
-           
-
         }
 
 

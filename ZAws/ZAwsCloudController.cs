@@ -1,19 +1,28 @@
-﻿using Amazon.EC2;
-using Amazon;
-using System;
-using Amazon.EC2.Model;
+﻿using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+
+using Amazon;
+using Amazon.Route53;
+using Amazon.Route53.Model;
+using Amazon.EC2;
+using Amazon.EC2.Model;
+using Amazon.S3;
+using Amazon.S3.Model;
+
+
 namespace ZAws
 {
     class ZAwsEc2Controller
     {
         string awsAccessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
         string awsSecretKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
-        string awsZoneUrl = "https://eu-west-1.ec2.amazonaws.com";
+        string awsEc2ZoneUrl = "https://eu-west-1.ec2.amazonaws.com";
 
         AmazonEC2 ec2 = null;
+        AmazonRoute53 route53 = null;
+        AmazonS3 s3 = null;
 
         public ZAwsEc2Controller()
         {
@@ -34,6 +43,8 @@ namespace ZAws
         private Thread MonitoringThread = null;
         List<ZAwsEc2> currentStatusEc2 = new List<ZAwsEc2>();
         List<ZAwsElasticIp> currentStatusElIps = new List<ZAwsElasticIp>();
+        List<ZAwsHostedZone> currentHostedZones = new List<ZAwsHostedZone>();
+        List<ZAwsS3> currentS3Buckets = new List<ZAwsS3>();
 
         public void Connect()
         {
@@ -42,11 +53,18 @@ namespace ZAws
                 throw new ZAwsEWrongState("Controller is already open");
             }
 
+            Debug.Assert(route53 == null);
+            Debug.Assert(s3 == null);
+
             Debug.Assert(!RunMonitoring);
             Debug.Assert(MonitoringThread == null);
 
             ec2 = AWSClientFactory.CreateAmazonEC2Client(awsAccessKey, awsSecretKey,
-                        new AmazonEC2Config().WithServiceURL(awsZoneUrl));
+                        new AmazonEC2Config().WithServiceURL(awsEc2ZoneUrl));
+
+            route53 = AWSClientFactory.CreateAmazonRoute53Client(awsAccessKey, awsSecretKey);
+
+            s3 = AWSClientFactory.CreateAmazonS3Client(awsAccessKey, awsSecretKey);
 
             //Start the thread
             MonitoringThread = new Thread(new ThreadStart(MonitorFunction));
@@ -59,6 +77,8 @@ namespace ZAws
             {
                 Debug.Assert(RunMonitoring);
                 Debug.Assert(MonitoringThread != null);
+                Debug.Assert(route53 != null);
+                Debug.Assert(s3 != null);
 
                 bool killedTheThread = false;
                 //Shut the thread
@@ -76,6 +96,12 @@ namespace ZAws
                 ec2.Dispose();
                 ec2 = null;
 
+                route53.Dispose();
+                route53 = null;
+
+                s3.Dispose();
+                s3 = null;
+
                 if (killedTheThread)
                 {
                     throw new ZAwsException("Connection failure, could not close connection gracefully. Might require restart.");
@@ -87,9 +113,6 @@ namespace ZAws
                 Debug.Assert(MonitoringThread == null);
             }
         }
-
-
-
         void MonitorFunction()
         {
             while (true)
@@ -103,6 +126,8 @@ namespace ZAws
                 }
                 DescribeInstancesResponse respEc2 = GetRunningInstances();
                 DescribeAddressesResponse respElasitIp = GetElasticIps();
+                ListHostedZonesResponse route53Zones = GetHostedZones();
+                ListBucketsResponse s3Buckects = GetBuckets();
                 lock (Ec2Lock)
                 {
                     if (!RunMonitoring)
@@ -113,6 +138,8 @@ namespace ZAws
 
                 UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
                 UpdateClassOfObjects(currentStatusElIps, respElasitIp.DescribeAddressesResult.Address);
+                UpdateClassOfObjects(currentHostedZones, route53Zones.ListHostedZonesResult.HostedZones);
+                UpdateClassOfObjects(currentS3Buckets, s3Buckects.Buckets);
 
                 //Give ther threads a chance, and also allow user to smoothly disconnect
                 Thread.Sleep(200);
@@ -123,15 +150,27 @@ namespace ZAws
 
         private DescribeInstancesResponse GetRunningInstances()
         {
-            DescribeInstancesRequest ec2Request = new DescribeInstancesRequest();
-            DescribeInstancesResponse ec2Response = ec2.DescribeInstances(ec2Request);
-            return ec2Response;
+            DescribeInstancesRequest request = new DescribeInstancesRequest();
+            DescribeInstancesResponse resp = ec2.DescribeInstances(request);
+            return resp;
         }
         private DescribeAddressesResponse GetElasticIps()
         {
-            DescribeAddressesRequest ec2Request = new DescribeAddressesRequest();
-            DescribeAddressesResponse ec2Response = ec2.DescribeAddresses(ec2Request);
-            return ec2Response;
+            DescribeAddressesRequest request = new DescribeAddressesRequest();
+            DescribeAddressesResponse resp = ec2.DescribeAddresses(request);
+            return resp;
+        }
+        private ListHostedZonesResponse GetHostedZones()
+        {
+            ListHostedZonesRequest request = new ListHostedZonesRequest();
+            ListHostedZonesResponse resp = route53.ListHostedZones();
+            return resp;
+        }
+        private ListBucketsResponse GetBuckets()
+        {
+            ListBucketsRequest request = new ListBucketsRequest();
+            ListBucketsResponse resp = s3.ListBuckets();
+            return resp;
         }
 
 
@@ -226,8 +265,19 @@ namespace ZAws
                 {
                     Debug.Assert(ResponseData.GetType() == typeof(Address), "Wrong data passed to the object factory.");
                     return new ZAwsElasticIp(ZAwsEc2Controller, (Address)ResponseData);
+                } 
+                if (ZAwsType == typeof(ZAwsHostedZone))
+                {
+                    Debug.Assert(ResponseData.GetType() == typeof(HostedZone), "Wrong data passed to the object factory.");
+                    return new ZAwsHostedZone(ZAwsEc2Controller, (HostedZone)ResponseData);
+                } 
+                if (ZAwsType == typeof(ZAwsS3))
+                {
+                    Debug.Assert(ResponseData.GetType() == typeof(S3Bucket), "Wrong data passed to the object factory.");
+                    return new ZAwsS3(ZAwsEc2Controller, (S3Bucket)ResponseData);
                 }
-                return null;
+                Debug.Assert(false);
+                throw new ArgumentException("Unknown ZAWS Object class: " + ResponseData.GetType().ToString());
             }
         };
         ZAwsObjectFactory ObjectFactory;
