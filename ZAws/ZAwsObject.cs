@@ -31,6 +31,21 @@ namespace ZAws
             }
         }
 
+        internal void Update(Object ResponseData)
+        {
+            if (DoUpdate(ResponseData))
+            {
+                TriggerStatusChanged();
+            }
+        }
+
+        internal virtual void Delete()
+        {
+            TriggerObjectDeleted();
+        }
+
         public abstract string Name { get; }
+        protected abstract bool DoUpdate(Object responseData);
+        internal abstract bool EqualsData(Object responseData);
     }
 }

@@ -1,0 +1,7 @@
+ZAws - Z-Ware AWS Console
+
+This application provides OO .NET Interface towards AWS API and a simple UI that can be used to test the interface and also to monitor your services.
+
+To use it, modify the App.Config file to contain your keys and regions and then rebuild the application and start it.
+
+The goal of the project is to eventually suport all services and all features of AWS that Z-Ware itself is using. The projects starts with EC2, S3, IAM and Route53.

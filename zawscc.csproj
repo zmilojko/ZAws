@@ -108,6 +108,7 @@
       <DependentUpon>ZawsConsoleMain.cs</DependentUpon>
     </Compile>
     <Compile Include="ZAws\ZAwsEc2.cs" />
+    <Compile Include="ZAws\ZAwsElasticIp.cs" />
     <Compile Include="ZAws\ZAwsExceptions.cs" />
     <Compile Include="ZAws\ZAwsObject.cs" />
   </ItemGroup>

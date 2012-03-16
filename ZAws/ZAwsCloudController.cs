@@ -9,16 +9,16 @@ namespace ZAws
 {
     class ZAwsEc2Controller
     {
-
-
-
-
         string awsAccessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
         string awsSecretKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
         string awsZoneUrl = "https://eu-west-1.ec2.amazonaws.com";
 
         AmazonEC2 ec2 = null;
-        
+
+        public ZAwsEc2Controller()
+        {
+            ObjectFactory = new ZAwsObjectFactory() { ZAwsEc2Controller = this };
+        }
         public class ZAwsNewObjectEventArgs : EventArgs
         {
             public ZAwsNewObjectEventArgs(ZAwsObject arg)
@@ -32,11 +32,12 @@ namespace ZAws
         private bool RunMonitoring = false;
         private object Ec2Lock = new object();
         private Thread MonitoringThread = null;
-        List<ZAwsEc2> currentStatus = new List<ZAwsEc2>();
+        List<ZAwsEc2> currentStatusEc2 = new List<ZAwsEc2>();
+        List<ZAwsElasticIp> currentStatusElIps = new List<ZAwsElasticIp>();
 
         public void Connect()
         {
-            if(ec2 != null)
+            if (ec2 != null)
             {
                 throw new ZAwsEWrongState("Controller is already open");
             }
@@ -93,8 +94,6 @@ namespace ZAws
         {
             while (true)
             {
-                DescribeInstancesResponse resp;
-                List<ZAwsEc2> zawsInstanceList = new List<ZAwsEc2>();
                 lock (Ec2Lock)
                 {
                     if (!RunMonitoring)
@@ -102,7 +101,8 @@ namespace ZAws
                         return;
                     }
                 }
-                resp = GetRunningInstances();
+                DescribeInstancesResponse respEc2 = GetRunningInstances();
+                DescribeAddressesResponse respElasitIp = GetElasticIps();
                 lock (Ec2Lock)
                 {
                     if (!RunMonitoring)
@@ -110,114 +110,84 @@ namespace ZAws
                         return;
                     }
                 }
-                foreach (Amazon.EC2.Model.Reservation res in resp.DescribeInstancesResult.Reservation)
-                {
-                    bool found = false;
-                    foreach (ZAwsEc2 oldI in this.currentStatus)
-                    {
-                        if (res.RunningInstance[0].InstanceId == oldI.InstanceId)
-                        {
-                            oldI.Update(res);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        var NewObj = new ZAwsEc2(this, res);
-                        currentStatus.Add(NewObj);
-                        if (NewObject != null)
-                        {
-                            NewObject(this, new ZAwsNewObjectEventArgs(NewObj));
-                        }
-                    }
-                }
 
-                //Now do check for terminated ones!
-                List<ZAwsEc2> toDeleteList = new List<ZAwsEc2>();
-                foreach (ZAwsEc2 oldI in this.currentStatus)
-                {
-                    bool found = false;
-                    foreach (Amazon.EC2.Model.Reservation res in resp.DescribeInstancesResult.Reservation)
-                    {
-                        if (res.RunningInstance[0].InstanceId == oldI.InstanceId)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        toDeleteList.Add(oldI);
-                    }
-                }
-                foreach (ZAwsEc2 oldToDelete in toDeleteList)
-                {
-                    this.currentStatus.Remove(oldToDelete);
-                    oldToDelete.Delete();
-                }
-
+                UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
+                UpdateClassOfObjects(currentStatusElIps, respElasitIp.DescribeAddressesResult.Address);
 
                 //Give ther threads a chance, and also allow user to smoothly disconnect
                 Thread.Sleep(200);
             }
         }
 
-        /*
-        bool ChangeExists(ZAwsEc2[] newStatus)
-        {
-            //TODO:
-            foreach (ZAwsEc2 newI in newStatus)
-            {
-                bool found = false;
-                foreach (ZAwsEc2 oldI in this.currentStatus)
-                {
-                    if (newI.InstanceId == oldI.InstanceId)
-                    {
-                        if (newI.Name != oldI.Name
-                            || newI.StatusCode != oldI.StatusCode
-                            )
-                        {
-                            currentStatus = newStatus;
-                            return true;                                       // at least this one has changed
-                        }
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    currentStatus = newStatus;
-                    return true;                                                //there is a new one
-                }
-            }
-            foreach (ZAwsEc2 oldI in this.currentStatus)
-            {
-                bool found = false;
-                foreach (ZAwsEc2 newI in newStatus)
-                {
-                    if (newI.InstanceId == oldI.InstanceId)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    currentStatus = newStatus;
-                    return true;                                                //there is at least one removed
-                }
-            }
-            return false;
-        }
-        */
-        public DescribeInstancesResponse GetRunningInstances()
+
+
+        private DescribeInstancesResponse GetRunningInstances()
         {
             DescribeInstancesRequest ec2Request = new DescribeInstancesRequest();
             DescribeInstancesResponse ec2Response = ec2.DescribeInstances(ec2Request);
             return ec2Response;
         }
+        private DescribeAddressesResponse GetElasticIps()
+        {
+            DescribeAddressesRequest ec2Request = new DescribeAddressesRequest();
+            DescribeAddressesResponse ec2Response = ec2.DescribeAddresses(ec2Request);
+            return ec2Response;
+        }
 
+
+        void UpdateClassOfObjects<T, U>(List<T> ListToUpdate, List<U> ListOfResponses) where T : ZAwsObject
+        {
+            //UpdateClassOfObjects(currentStatus, resp.DescribeInstancesResult.Reservation);
+            foreach (U res in ListOfResponses)
+            {
+                bool found = false;
+                foreach (T oldI in ListToUpdate)
+                {
+                    if (oldI.EqualsData(res))
+                    {
+                        oldI.Update(res);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    T NewObj = (T)ObjectFactory.CreateZawsObject(typeof(T), res);
+                    ListToUpdate.Add(NewObj);
+                    if (NewObject != null)
+                    {
+                        NewObject(this, new ZAwsNewObjectEventArgs(NewObj));
+                    }
+                }
+            }
+
+            //Now do check for terminated ones!
+            List<T> toDeleteList = new List<T>();
+            foreach (T oldI in ListToUpdate)
+            {
+                bool found = false;
+                foreach (U res in ListOfResponses)
+                {
+                    if (oldI.EqualsData(res))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    toDeleteList.Add(oldI);
+                }
+            }
+            foreach (T oldToDelete in toDeleteList)
+            {
+                ListToUpdate.Remove(oldToDelete);
+                oldToDelete.Delete();
+            }
+        }
+
+
+        /*
         public bool StartInstance(ZAwsEc2 zAwsEc2Instance)
         {
             StartInstancesResponse resp = ec2.StartInstances(new StartInstancesRequest()
@@ -232,7 +202,7 @@ namespace ZAws
 
             return true;
         }
-
+        
         private void GetInfo()
         {
             //TODO: this is all just sample code to figure our the syntax! Do not use like this, it will not work.
@@ -240,6 +210,26 @@ namespace ZAws
 
             var resp = w.GetMetricStatistics(new Amazon.CloudWatch.Model.GetMetricStatisticsRequest());
             double b = resp.GetMetricStatisticsResult.Datapoints[0].Average;
-        }
+        }*/
+
+        class ZAwsObjectFactory
+        {
+            public ZAwsEc2Controller ZAwsEc2Controller;
+            public ZAwsObject CreateZawsObject(Type ZAwsType, Object ResponseData)
+            {
+                if (ZAwsType == typeof(ZAwsEc2))
+                {
+                    Debug.Assert(ResponseData.GetType() == typeof(Reservation), "Wrong data passed to the object factory.");
+                    return new ZAwsEc2(ZAwsEc2Controller, (Reservation)ResponseData);
+                }
+                if (ZAwsType == typeof(ZAwsElasticIp))
+                {
+                    Debug.Assert(ResponseData.GetType() == typeof(Address), "Wrong data passed to the object factory.");
+                    return new ZAwsElasticIp(ZAwsEc2Controller, (Address)ResponseData);
+                }
+                return null;
+            }
+        };
+        ZAwsObjectFactory ObjectFactory;
     }
 }
