@@ -100,6 +100,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ZAws\ZAwsSnapshot.cs" />
+    <Compile Include="ZAws\ZAwsKeyPair.cs" />
+    <Compile Include="ZAws\ZAwsSecGroup.cs" />
     <Compile Include="ZAws\ZAwsHostedZone.cs" />
     <Compile Include="ZAws\ZAwsS3.cs" />
     <Compile Include="ZAws\ZAwsCloudController.cs" />

@@ -26,7 +26,6 @@ namespace ZAws
 
         public ZAwsEc2Controller()
         {
-            ObjectFactory = new ZAwsObjectFactory() { ZAwsEc2Controller = this };
         }
         public class ZAwsNewObjectEventArgs : EventArgs
         {
@@ -45,6 +44,9 @@ namespace ZAws
         List<ZAwsElasticIp> currentStatusElIps = new List<ZAwsElasticIp>();
         List<ZAwsHostedZone> currentHostedZones = new List<ZAwsHostedZone>();
         List<ZAwsS3> currentS3Buckets = new List<ZAwsS3>();
+        List<ZAwsSecGroup> currentSecGroups = new List<ZAwsSecGroup>();
+        List<ZAwsKeyPair> currentKeyPairs = new List<ZAwsKeyPair>();
+        List<ZAwsSnapshot> currentSnapshots = new List<ZAwsSnapshot>();
 
         public void Connect()
         {
@@ -113,67 +115,44 @@ namespace ZAws
                 Debug.Assert(MonitoringThread == null);
             }
         }
+        #region Monitor query functions
         void MonitorFunction()
         {
             while (true)
             {
-                lock (Ec2Lock)
-                {
-                    if (!RunMonitoring)
-                    {
-                        return;
-                    }
-                }
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                 DescribeInstancesResponse respEc2 = GetRunningInstances();
-                DescribeAddressesResponse respElasitIp = GetElasticIps();
-                ListHostedZonesResponse route53Zones = GetHostedZones();
-                ListBucketsResponse s3Buckects = GetBuckets();
-                lock (Ec2Lock)
-                {
-                    if (!RunMonitoring)
-                    {
-                        return;
-                    }
-                }
-
                 UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeAddressesResponse respElasitIp = GetElasticIps();
                 UpdateClassOfObjects(currentStatusElIps, respElasitIp.DescribeAddressesResult.Address);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                ListHostedZonesResponse route53Zones = GetHostedZones();
                 UpdateClassOfObjects(currentHostedZones, route53Zones.ListHostedZonesResult.HostedZones);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                ListBucketsResponse s3Buckects = GetBuckets();
                 UpdateClassOfObjects(currentS3Buckets, s3Buckects.Buckets);
 
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeSnapshotsResponse respEc2Snapshots = GetSnapshots();
+                UpdateClassOfObjects(currentSnapshots, respEc2Snapshots.DescribeSnapshotsResult.Snapshot);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeKeyPairsResponse respKeyPairs = GetKeyPairs();
+                UpdateClassOfObjects(currentKeyPairs, respKeyPairs.DescribeKeyPairsResult.KeyPair);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeSecurityGroupsResponse respSecGroups = GetSecurityGroups();
+                UpdateClassOfObjects(currentSecGroups, respSecGroups.DescribeSecurityGroupsResult.SecurityGroup);
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                
                 //Give ther threads a chance, and also allow user to smoothly disconnect
                 Thread.Sleep(200);
             }
         }
-
-
-
-        private DescribeInstancesResponse GetRunningInstances()
-        {
-            DescribeInstancesRequest request = new DescribeInstancesRequest();
-            DescribeInstancesResponse resp = ec2.DescribeInstances(request);
-            return resp;
-        }
-        private DescribeAddressesResponse GetElasticIps()
-        {
-            DescribeAddressesRequest request = new DescribeAddressesRequest();
-            DescribeAddressesResponse resp = ec2.DescribeAddresses(request);
-            return resp;
-        }
-        private ListHostedZonesResponse GetHostedZones()
-        {
-            ListHostedZonesRequest request = new ListHostedZonesRequest();
-            ListHostedZonesResponse resp = route53.ListHostedZones();
-            return resp;
-        }
-        private ListBucketsResponse GetBuckets()
-        {
-            ListBucketsRequest request = new ListBucketsRequest();
-            ListBucketsResponse resp = s3.ListBuckets();
-            return resp;
-        }
-
-
         void UpdateClassOfObjects<T, U>(List<T> ListToUpdate, List<U> ListOfResponses) where T : ZAwsObject
         {
             //UpdateClassOfObjects(currentStatus, resp.DescribeInstancesResult.Reservation);
@@ -191,7 +170,7 @@ namespace ZAws
                 }
                 if (!found)
                 {
-                    T NewObj = (T)ObjectFactory.CreateZawsObject(typeof(T), res);
+                    T NewObj = (T)Activator.CreateInstance(typeof(T), this, res);
                     ListToUpdate.Add(NewObj);
                     if (NewObject != null)
                     {
@@ -224,7 +203,48 @@ namespace ZAws
                 oldToDelete.Delete();
             }
         }
-
+        private DescribeInstancesResponse GetRunningInstances()
+        {
+            DescribeInstancesRequest request = new DescribeInstancesRequest();
+            DescribeInstancesResponse resp = ec2.DescribeInstances(request);
+            return resp;
+        }
+        private DescribeAddressesResponse GetElasticIps()
+        {
+            DescribeAddressesRequest request = new DescribeAddressesRequest();
+            DescribeAddressesResponse resp = ec2.DescribeAddresses(request);
+            return resp;
+        }
+        private ListHostedZonesResponse GetHostedZones()
+        {
+            ListHostedZonesResponse resp = route53.ListHostedZones();
+            return resp;
+        }
+        private ListBucketsResponse GetBuckets()
+        {
+            ListBucketsResponse resp = s3.ListBuckets();
+            return resp;
+        }
+        private DescribeSecurityGroupsResponse GetSecurityGroups()
+        {
+            DescribeSecurityGroupsRequest request = new DescribeSecurityGroupsRequest();
+            DescribeSecurityGroupsResponse resp = ec2.DescribeSecurityGroups(request);
+            return resp;
+        }
+        private DescribeSnapshotsResponse GetSnapshots()
+        {
+            DescribeSnapshotsRequest request = new DescribeSnapshotsRequest()
+                            .WithOwner("self");
+            DescribeSnapshotsResponse resp = ec2.DescribeSnapshots(request);
+            return resp;
+        }
+        private DescribeKeyPairsResponse GetKeyPairs()
+        {
+            DescribeKeyPairsRequest request = new DescribeKeyPairsRequest();
+            DescribeKeyPairsResponse resp = ec2.DescribeKeyPairs(request);
+            return resp;
+        }
+        #endregion
 
         /*
         public bool StartInstance(ZAwsEc2 zAwsEc2Instance)
@@ -250,36 +270,5 @@ namespace ZAws
             var resp = w.GetMetricStatistics(new Amazon.CloudWatch.Model.GetMetricStatisticsRequest());
             double b = resp.GetMetricStatisticsResult.Datapoints[0].Average;
         }*/
-
-        class ZAwsObjectFactory
-        {
-            public ZAwsEc2Controller ZAwsEc2Controller;
-            public ZAwsObject CreateZawsObject(Type ZAwsType, Object ResponseData)
-            {
-                if (ZAwsType == typeof(ZAwsEc2))
-                {
-                    Debug.Assert(ResponseData.GetType() == typeof(Reservation), "Wrong data passed to the object factory.");
-                    return new ZAwsEc2(ZAwsEc2Controller, (Reservation)ResponseData);
-                }
-                if (ZAwsType == typeof(ZAwsElasticIp))
-                {
-                    Debug.Assert(ResponseData.GetType() == typeof(Address), "Wrong data passed to the object factory.");
-                    return new ZAwsElasticIp(ZAwsEc2Controller, (Address)ResponseData);
-                } 
-                if (ZAwsType == typeof(ZAwsHostedZone))
-                {
-                    Debug.Assert(ResponseData.GetType() == typeof(HostedZone), "Wrong data passed to the object factory.");
-                    return new ZAwsHostedZone(ZAwsEc2Controller, (HostedZone)ResponseData);
-                } 
-                if (ZAwsType == typeof(ZAwsS3))
-                {
-                    Debug.Assert(ResponseData.GetType() == typeof(S3Bucket), "Wrong data passed to the object factory.");
-                    return new ZAwsS3(ZAwsEc2Controller, (S3Bucket)ResponseData);
-                }
-                Debug.Assert(false);
-                throw new ArgumentException("Unknown ZAWS Object class: " + ResponseData.GetType().ToString());
-            }
-        };
-        ZAwsObjectFactory ObjectFactory;
     }
 }

@@ -117,6 +117,6 @@
         private System.Windows.Forms.Button buttonStop;
         private System.Windows.Forms.Button buttonOpen;
         private System.Windows.Forms.Button buttonCloseAll;
-        private ZawsListView awsListView;
+        private System.Windows.Forms.ListView awsListView;
     }
 }

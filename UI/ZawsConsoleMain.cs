@@ -25,6 +25,12 @@ namespace ZAws.Console
             //awsListView.Items.Add("Please wait until ZAws Console connects to the AWS servers...");
             controller.NewObject += new EventHandler<ZAwsEc2Controller.ZAwsNewObjectEventArgs>(controller_NewObject);
             controller.Connect();
+
+            //Create groups
+            awsListView.Groups.Add(new ListViewGroup("EC2","EC2 Instances")); 
+            awsListView.Groups.Add(new ListViewGroup("S3","S3 Buckets")); 
+            awsListView.Groups.Add(new ListViewGroup("DNS","Route 53 Hosted Zones")); 
+            awsListView.Groups.Add(new ListViewGroup("EC2x","Other EC2 Objects")); 
         }
 
         void controller_NewObject(object sender, ZAwsEc2Controller.ZAwsNewObjectEventArgs e)
@@ -40,9 +46,34 @@ namespace ZAws.Console
             {
                 awsListView.Items.Clear();
             }
-            awsListView.Items.Add(new ListViewItem(e.NewObject.Name))
-                .Tag = e.NewObject;
 
+            ListViewGroup g;
+            if (e.NewObject.GetType() == typeof(ZAwsEc2) || e.NewObject.GetType() == typeof(ZAwsElasticIp))
+            {
+                g = awsListView.Groups["EC2"];
+                awsListView.ShowGroups = true;
+            }
+            else if (e.NewObject.GetType() == typeof(ZAwsS3))
+            {
+                g = awsListView.Groups["S3"];
+                awsListView.ShowGroups = true;
+            } 
+            else if (e.NewObject.GetType() == typeof(ZAwsHostedZone))
+            {
+                g = awsListView.Groups["DNS"];
+                awsListView.ShowGroups = true;
+            }
+            else
+            {
+                g = awsListView.Groups["EC2x"];
+            }
+
+            ListViewItem newItem = new ListViewItem(e.NewObject.Name);
+            newItem.Tag = e.NewObject;
+            awsListView.Items.Add(newItem);
+            g.Items.Add(newItem);
+
+            
             e.NewObject.StatusChanged += new EventHandler(ZAwsObject_StatusChanged);
             e.NewObject.ObjectDeleted += new EventHandler(ZAwsObject_ObjectDeleted);
         }
@@ -182,6 +213,18 @@ namespace ZAws.Console
             else if (e.Item.Tag.GetType() == typeof(ZAwsHostedZone))
             {
                 e.Graphics.DrawString("DNS", IconFont, Brushes.Blue, IconSpace);
+            }
+            else if (e.Item.Tag.GetType() == typeof(ZAwsSnapshot))
+            {
+                e.Graphics.DrawString("IMG", IconFont, Brushes.Blue, IconSpace);
+            }
+            else if (e.Item.Tag.GetType() == typeof(ZAwsSecGroup))
+            {
+                e.Graphics.DrawString("Sec", IconFont, Brushes.Blue, IconSpace);
+            }
+            else if (e.Item.Tag.GetType() == typeof(ZAwsKeyPair))
+            {
+                e.Graphics.DrawString("Keys", IconFont, Brushes.Blue, IconSpace);
             }
             else
             {
