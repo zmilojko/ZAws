@@ -36,5 +36,11 @@ namespace ZAws
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.KeyPair), "Wrong data passed to the object for update.");
             return string.Equals(ResponseData.KeyFingerprint, ((Amazon.EC2.Model.KeyPair)responseData).KeyFingerprint);
         }
+
+        protected override void DoDeleteObject()
+        {
+            Amazon.EC2.Model.DeleteKeyPairResponse resp = myController.ec2.DeleteKeyPair(new Amazon.EC2.Model.DeleteKeyPairRequest()
+                                                                    .WithKeyName(this.ResponseData.KeyName));
+        }
     }
 }

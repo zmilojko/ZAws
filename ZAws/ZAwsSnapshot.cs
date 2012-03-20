@@ -36,5 +36,11 @@ namespace ZAws
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.Snapshot), "Wrong data passed to the object for update.");
             return string.Equals(Name, ((Amazon.EC2.Model.Snapshot)responseData).SnapshotId);
         }
+
+        protected override void DoDeleteObject()
+        {
+            Amazon.EC2.Model.DeleteSnapshotResponse resp = myController.ec2.DeleteSnapshot(new Amazon.EC2.Model.DeleteSnapshotRequest()
+                                                                    .WithSnapshotId(this.ResponseData.SnapshotId));
+        }
     }
 }

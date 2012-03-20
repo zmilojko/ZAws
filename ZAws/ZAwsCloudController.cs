@@ -20,12 +20,15 @@ namespace ZAws
         string awsSecretKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
         string awsEc2ZoneUrl = "https://eu-west-1.ec2.amazonaws.com";
 
-        AmazonEC2 ec2 = null;
-        AmazonRoute53 route53 = null;
-        AmazonS3 s3 = null;
+        internal AmazonEC2 ec2 {get; private set;}
+        internal AmazonRoute53 route53 { get; private set; }
+        internal AmazonS3 s3 { get; private set; }
 
         public ZAwsEc2Controller()
         {
+            ec2 = null;
+            route53 = null;
+            s3 = null;
         }
         public class ZAwsNewObjectEventArgs : EventArgs
         {
@@ -47,6 +50,20 @@ namespace ZAws
         List<ZAwsSecGroup> currentSecGroups = new List<ZAwsSecGroup>();
         List<ZAwsKeyPair> currentKeyPairs = new List<ZAwsKeyPair>();
         List<ZAwsSnapshot> currentSnapshots = new List<ZAwsSnapshot>();
+        List<ZAwsAmi> currentAmis = new List<ZAwsAmi>();
+        List<ZAwsEbsVolume> currentEbsVolumes = new List<ZAwsEbsVolume>();
+
+        public ZAwsEc2 GetEc2(string InstanceId)
+        {
+            foreach (var i in currentStatusEc2)
+            {
+                if (i.InstanceId == InstanceId)
+                {
+                    return i;
+                }
+            }
+            throw new ZAwsEInstanceNotFound("Cannot find an instance with ID " + InstanceId);
+        }
 
         public void Connect()
         {
@@ -147,6 +164,15 @@ namespace ZAws
                 lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                 DescribeSecurityGroupsResponse respSecGroups = GetSecurityGroups();
                 UpdateClassOfObjects(currentSecGroups, respSecGroups.DescribeSecurityGroupsResult.SecurityGroup);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeImagesResponse respAmis = GetAmis();
+                UpdateClassOfObjects(currentAmis, respAmis.DescribeImagesResult.Image);
+
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeVolumesResponse respEbsVolumes = GetEbsVolumes();
+                UpdateClassOfObjects(currentEbsVolumes, respEbsVolumes.DescribeVolumesResult.Volume);
+
                 lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                 
                 //Give ther threads a chance, and also allow user to smoothly disconnect
@@ -242,6 +268,19 @@ namespace ZAws
         {
             DescribeKeyPairsRequest request = new DescribeKeyPairsRequest();
             DescribeKeyPairsResponse resp = ec2.DescribeKeyPairs(request);
+            return resp;
+        }
+        private DescribeVolumesResponse GetEbsVolumes()
+        {
+            DescribeVolumesRequest request = new DescribeVolumesRequest();
+            DescribeVolumesResponse resp = ec2.DescribeVolumes(request);
+            return resp;
+        }
+        private DescribeImagesResponse GetAmis()
+        {
+            DescribeImagesRequest request = new DescribeImagesRequest()
+                .WithOwner("self");
+            DescribeImagesResponse resp = ec2.DescribeImages(request);
             return resp;
         }
         #endregion

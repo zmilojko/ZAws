@@ -46,6 +46,12 @@ namespace ZAws
 
         public abstract string Name { get; }
         protected abstract bool DoUpdate(Object responseData);
+        protected abstract void DoDeleteObject();
         internal abstract bool EqualsData(Object responseData);
+
+        public void DeleteObject()
+        {
+            DoDeleteObject();
+        }
     }
 }

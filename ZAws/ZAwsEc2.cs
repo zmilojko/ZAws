@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using Amazon.EC2.Model;
 
 namespace ZAws
 {
     class ZAwsEc2 : ZAwsObject
     {
-
-
         public Amazon.EC2.Model.Reservation Reservation { get; private set; }
 
         public ZAwsEc2(ZAwsEc2Controller controller, Amazon.EC2.Model.Reservation res)
@@ -86,6 +85,49 @@ namespace ZAws
         {
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.Reservation), "Wrong data passed to the object for update.");
             return string.Equals(InstanceId, ((Amazon.EC2.Model.Reservation)responseData).RunningInstance[0].InstanceId);
+        }
+
+        internal void Start()
+        {
+            StartInstancesResponse resp = myController.ec2.StartInstances(new StartInstancesRequest()
+                    .WithInstanceId(InstanceId));
+        }
+
+        internal void Stop()
+        {
+            StopInstancesResponse resp = myController.ec2.StopInstances(new StopInstancesRequest()
+                    .WithInstanceId(InstanceId));
+        }
+
+        protected override void DoDeleteObject()
+        {
+            if (Status != Ec2Status.Terminated)
+            {
+                TerminateInstancesResponse resp = myController.ec2.TerminateInstances(new TerminateInstancesRequest()
+                                                        .WithInstanceId(InstanceId));
+            }
+        }
+
+        internal void StartTerminal()
+        {
+            string awsKeyPath = System.Configuration.ConfigurationManager.AppSettings["SSHPrivateKeysDir"];
+            string awsTerminalApp = System.Configuration.ConfigurationManager.AppSettings["SSHTerminalApp"];
+            string awsTerminalCommandLines = string.Format(System.Configuration.ConfigurationManager.AppSettings["SSHTerminaAppArgs"],
+                this.Reservation.RunningInstance[0].PublicDnsName,
+                awsKeyPath + this.Reservation.RunningInstance[0].KeyName + ".ppk");
+
+            Process p = Process.Start(awsTerminalApp, awsTerminalCommandLines);
+        }
+
+        internal void StartSshFileBrowser()
+        {
+            string awsKeyPath = System.Configuration.ConfigurationManager.AppSettings["SSHPrivateKeysDir"];
+            string awsTerminalApp = System.Configuration.ConfigurationManager.AppSettings["SSHFileBrowserApp"];
+            string awsTerminalCommandLines = string.Format(System.Configuration.ConfigurationManager.AppSettings["SSHFileBrowserAppArgs"],
+                this.Reservation.RunningInstance[0].PublicDnsName,
+                awsKeyPath + this.Reservation.RunningInstance[0].KeyName + ".ppk");
+
+            Process p = Process.Start(awsTerminalApp, awsTerminalCommandLines);
         }
     }
 }

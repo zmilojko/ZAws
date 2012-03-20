@@ -36,5 +36,12 @@ namespace ZAws
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.SecurityGroup), "Wrong data passed to the object for update.");
             return string.Equals(ResponseData.GroupId, ((Amazon.EC2.Model.SecurityGroup)responseData).GroupId);
         }
+
+        protected override void DoDeleteObject()
+        {
+            Amazon.EC2.Model.DeleteSecurityGroupResponse resp = myController.ec2.DeleteSecurityGroup(
+                                                        new Amazon.EC2.Model.DeleteSecurityGroupRequest()
+                                                                    .WithGroupId(this.ResponseData.GroupId));
+        }
     }
 }

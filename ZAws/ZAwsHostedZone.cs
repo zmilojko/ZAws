@@ -36,5 +36,12 @@ namespace ZAws
             Debug.Assert(responseData.GetType() == typeof(Amazon.Route53.Model.HostedZone), "Wrong data passed to the object for update.");
             return string.Equals(Name, ((Amazon.Route53.Model.HostedZone)responseData).Name);
         }
+
+        protected override void DoDeleteObject()
+        {
+            Amazon.Route53.Model.DeleteHostedZoneResponse resp = myController.route53.DeleteHostedZone(
+                                                new Amazon.Route53.Model.DeleteHostedZoneRequest()
+                                                                    .WithId(this.ResponseData.Id));
+        }
     }
 }

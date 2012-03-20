@@ -36,5 +36,11 @@ namespace ZAws
             Debug.Assert(responseData.GetType() == typeof(Amazon.S3.Model.S3Bucket), "Wrong data passed to the object for update.");
             return string.Equals(Name, ((Amazon.S3.Model.S3Bucket)responseData).BucketName);
         }
+
+        protected override void DoDeleteObject()
+        {
+            Amazon.S3.Model.DeleteBucketResponse resp = myController.s3.DeleteBucket(new Amazon.S3.Model.DeleteBucketRequest()
+                                                                    .WithBucketName(Name));
+        }
     }
 }

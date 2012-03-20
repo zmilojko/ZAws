@@ -7,4 +7,6 @@ namespace ZAws
 
     class ZAwsEWrongState : ZAwsException
     { public ZAwsEWrongState(string msg) : base(msg) { } }
+    class ZAwsEInstanceNotFound : ZAwsException
+    { public ZAwsEInstanceNotFound(string msg) : base(msg) { } }
 }
