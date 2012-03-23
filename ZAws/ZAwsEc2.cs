@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Amazon.EC2.Model;
+using Amazon.CloudWatch.Model;
 
 namespace ZAws
 {
@@ -15,6 +16,8 @@ namespace ZAws
             : base(controller)
         {
             Update(res);
+
+            StatisticsValid = false;
         }
 
         public override string Name
@@ -128,6 +131,56 @@ namespace ZAws
                 awsKeyPath + this.Reservation.RunningInstance[0].KeyName + ".ppk");
 
             Process p = Process.Start(awsTerminalApp, awsTerminalCommandLines);
+        }
+
+        public bool StatisticsValid { get; private set; }
+        public int CPUUtilizationMax { get; private set; }
+        public int CPUUtilizationAvg { get; private set; }
+
+
+        internal void UpdateInfo()
+        {
+            /*
+            var resp = myController.CloudWatch.ListMetrics(new Amazon.CloudWatch.Model.ListMetricsRequest()
+            
+                                                                .WithNamespace("AWS/EC2")
+                                                                
+                                                                .WithDimensions(new DimensionFilter()
+                                                                                            .WithName("InstanceId")
+                                                                                            .WithValue(this.InstanceId)));
+            */
+            var resp2 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
+                                                                .WithNamespace("AWS/EC2")
+                                                                
+                                                                .WithDimensions(new Dimension()
+                                                                                            .WithName("InstanceId")
+                                                                                            .WithValue(this.InstanceId))
+                                                                 
+                                                                .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
+                                                                .WithEndTime(DateTime.Now.ToUniversalTime())
+                                                                .WithPeriod(300)
+                                                                .WithMetricName("CPUUtilization")
+                                                                .WithUnit("Percent")
+                                                                .WithStatistics("Average","Maximum"));
+
+            if (resp2.GetMetricStatisticsResult.Datapoints.Count > 0)
+            {
+
+                int CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Maximum;
+                if (CPUUtilizationTemp != CPUUtilizationMax)
+                {
+                    CPUUtilizationMax = CPUUtilizationTemp;
+                    this.TriggerStatusChanged();
+                } 
+                CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Average;
+                if (CPUUtilizationTemp != CPUUtilizationAvg)
+                {
+                    CPUUtilizationAvg = CPUUtilizationTemp;
+                    this.TriggerStatusChanged();
+                }
+                StatisticsValid = true;
+            }
+         
         }
     }
 }

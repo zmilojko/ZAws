@@ -89,6 +89,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\DlgLaunchNewInstance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\DlgLaunchNewInstance.Designer.cs">
+      <DependentUpon>DlgLaunchNewInstance.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\ZAwsListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -152,6 +158,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\DlgLaunchNewInstance.resx">
+      <DependentUpon>DlgLaunchNewInstance.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ZawsConsoleMain.resx">
       <DependentUpon>ZawsConsoleMain.cs</DependentUpon>

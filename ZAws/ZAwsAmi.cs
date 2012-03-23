@@ -37,17 +37,23 @@ namespace ZAws
             return string.Equals(ResponseData.ImageId, ((Amazon.EC2.Model.Image)responseData).ImageId);
         }
 
-        internal void Launch(ZAwsSecGroup SecGroup, ZAwsKeyPair KeyPair)
+        internal void Launch(ZAwsSecGroup SecGroup, ZAwsKeyPair KeyPair, string Name, string StartupScript)
         {
-            Amazon.EC2.Model.RunInstancesResponse response = myController.ec2.RunInstances(new Amazon.EC2.Model.RunInstancesRequest()
+            var req = new Amazon.EC2.Model.RunInstancesRequest()
               .WithImageId(this.ResponseData.ImageId)
               .WithInstanceType("t1.micro")
               .WithKeyName(KeyPair.Name)
               .WithSecurityGroupId(SecGroup.ResponseData.GroupId)
               .WithMinCount(1)
               .WithMaxCount(1)
-              .WithUserData(Convert.ToBase64String(Encoding.UTF8.GetBytes("ls".Replace("\r", ""))))
-            );
+              .WithUserData(Convert.ToBase64String(Encoding.UTF8.GetBytes(StartupScript.Replace("\r", ""))));
+
+
+            Amazon.EC2.Model.RunInstancesResponse response = myController.ec2.RunInstances(req);
+
+            Amazon.EC2.Model.CreateTagsResponse response2 =  myController.ec2.CreateTags(new Amazon.EC2.Model.CreateTagsRequest()
+                                                .WithResourceId(response.RunInstancesResult.Reservation.RunningInstance[0].InstanceId)
+                                                .WithTag(new Amazon.EC2.Model.Tag().WithKey("Name").WithValue(Name)));
 
         }
 

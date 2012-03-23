@@ -125,8 +125,8 @@ namespace ZAws.Console
 
             awsListView.Left = 12;
             awsListView.Top = 12;
-            awsListView.Height = this.ClientSize.Height;
-            awsListView.Width = buttonStart.Left - 12;
+            awsListView.Height = this.ClientSize.Height - 24;
+            awsListView.Width = buttonStart.Left - 20;
 
             //Size of tiles - this should amke ti minimum 100, while filling the area.
             int c = awsListView.Width / 100;
@@ -185,6 +185,16 @@ namespace ZAws.Console
                 {
                     case ZAwsEc2.Ec2Status.Running:
                         e.Graphics.DrawString("EC2", IconFont, Brushes.Green, IconSpace);
+                        if(ec2.StatisticsValid)
+                        {
+                            bool healthy = ec2.CPUUtilizationMax < 90 && ec2.CPUUtilizationAvg < 60;
+
+                            e.Graphics.DrawString(string.Format("CPU: {0}", (healthy ? "healthy" : "rough")),
+                                            NameFont, (healthy ? Brushes.DarkGreen : Brushes.Red), DetailsSpace1);
+                            e.Graphics.DrawString(string.Format("^{0}% >{1}%", ec2.CPUUtilizationMax, ec2.CPUUtilizationAvg),
+                                            NameFont, (healthy ? Brushes.DarkGreen : Brushes.Red), DetailsSpace2); 
+
+                        }
                         break;
                     case ZAwsEc2.Ec2Status.Stopped:
                         e.Graphics.DrawString("EC2", IconFont, Brushes.Red, IconSpace);
@@ -212,13 +222,15 @@ namespace ZAws.Console
             else if (e.Item.Tag.GetType() == typeof(ZAwsElasticIp))
             {
                 ZAwsElasticIp ip = (ZAwsElasticIp)e.Item.Tag;
-                e.Graphics.DrawString("IP", IconFont, Brushes.Blue, IconSpace);
+                
                 if (ip.Associated)
                 {
+                    e.Graphics.DrawString("IP", IconFont, Brushes.Green, IconSpace);
                     e.Graphics.DrawString("=> " + ip.AssociatedEc2.Name, NameFont, Brushes.Black, DetailsSpace1);
                 }
                 else
                 {
+                    e.Graphics.DrawString("IP", IconFont, Brushes.Red, IconSpace);
                     e.Graphics.DrawString("=> X", NameFont, Brushes.Black, DetailsSpace1);
                 }
 
@@ -261,43 +273,65 @@ namespace ZAws.Console
 
         private void awsListView_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
             if (this.InvokeRequired)
             {
                 //Following Invoknig must be asynchronous, so not to cause deadlock with the Disconnect handler.
                 this.BeginInvoke(new EventHandler(awsListView_SelectedIndexChanged), sender, e);
                 return;
             }
-            foreach (Control ctrl in Controls)
-            {
-                if (ctrl.GetType() == typeof(Button)) { ctrl.Enabled = false; }
-            }
 
             buttonDelete.Enabled = awsListView.SelectedItems.Count > 0;
+            buttonIpNew.Enabled = true;
+            buttonDnsNew.Enabled = true;
 
+            bool buttonStartEnabled = false;
             foreach (ListViewItem item in awsListView.SelectedItems)
             {
                 if(item.Tag.GetType() == typeof(ZAwsEc2) && ((ZAwsEc2)item.Tag).Status == ZAwsEc2.Ec2Status.Stopped)
                 {
-                    buttonStart.Enabled = true;
+                    buttonStartEnabled = true;
                 }
             }
+            buttonStart.Enabled = buttonStartEnabled;
+
+            bool buttonStopEnabled = false;
             foreach (ListViewItem item in awsListView.SelectedItems)
             {
                 if (item.Tag.GetType() == typeof(ZAwsEc2) && ((ZAwsEc2)item.Tag).Status == ZAwsEc2.Ec2Status.Running)
                 {
-                    buttonStop.Enabled = true;
-                    buttonTerminal.Enabled = true;
-                    buttonFileBrowser.Enabled = true;
+                    buttonStopEnabled = true;
                 }
             }
-            foreach (ListViewItem item in awsListView.SelectedItems)
+            buttonStop.Enabled = buttonStopEnabled;
+            buttonTerminal.Enabled = buttonStopEnabled;
+            buttonFileBrowser.Enabled = buttonStopEnabled;
+
+            bool buttonIpAssociateEnabled = false;
+            if (awsListView.SelectedItems.Count == 1 && awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsElasticIp)
+                && ((ZAwsElasticIp)awsListView.SelectedItems[0].Tag).Associated)
             {
-                if (item.Tag.GetType() == typeof(ZAwsAmi))
-                {
-                    buttonLaunchEc2Instance.Enabled = true;
-                }
+                buttonIpAssociateEnabled = true;
+                buttonIpAssociate.Text = "Disassociate";
             }
 
+            if (awsListView.SelectedItems.Count == 2)
+            {
+                if (awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsElasticIp)
+                        && (!((ZAwsElasticIp)awsListView.SelectedItems[0].Tag).Associated)
+                        && awsListView.SelectedItems[1].Tag.GetType() == typeof(ZAwsEc2))
+                {
+                    buttonIpAssociateEnabled = true;
+                }
+                if (awsListView.SelectedItems[1].Tag.GetType() == typeof(ZAwsElasticIp)
+                        && (!((ZAwsElasticIp)awsListView.SelectedItems[1].Tag).Associated)
+                        && awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsEc2))
+                {
+                    buttonIpAssociateEnabled = true;
+                    buttonIpAssociate.Text = "Associate";
+                }
+            }
+            buttonIpAssociate.Enabled = buttonIpAssociateEnabled;
 
             //Check for launch: must be exactly one AMI, and zero or one of key and sec.
             bool Amipresent = false;
@@ -334,7 +368,6 @@ namespace ZAws.Console
                 }
             }
             buttonLaunchEc2Instance.Enabled = Amipresent && secGroupPresent && secKeyPresent;
-
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -397,7 +430,7 @@ namespace ZAws.Console
             {
                 return;
             }
-            ami.Launch(secGroup, keyPair);
+            new DlgLaunchNewInstance(controller, ami, secGroup, keyPair).ShowDialog();
         }
 
         private void buttonDelete_Click(object sender, EventArgs e)
@@ -436,6 +469,63 @@ namespace ZAws.Console
             }
         }
 
+        private void buttonIpNew_Click(object sender, EventArgs e)
+        {
+            controller.AllocateIp();
+        }
 
+        private void buttonIpAssociate_Click(object sender, EventArgs e)
+        {
+            if (awsListView.SelectedItems.Count == 1 && awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsElasticIp)
+                     && ((ZAwsElasticIp)awsListView.SelectedItems[0].Tag).Associated)
+            {
+                ((ZAwsElasticIp)awsListView.SelectedItems[0].Tag).Disassociate();
+                return;
+            }
+
+            ZAwsElasticIp ip = null;
+            ZAwsEc2 ec2 = null;
+            if (awsListView.SelectedItems.Count == 2)
+            {
+                if (awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsElasticIp)
+                        && (!((ZAwsElasticIp)awsListView.SelectedItems[0].Tag).Associated)
+                        && awsListView.SelectedItems[1].Tag.GetType() == typeof(ZAwsEc2))
+                {
+                    ip = (ZAwsElasticIp)awsListView.SelectedItems[0].Tag;
+                    ec2 = (ZAwsEc2)awsListView.SelectedItems[1].Tag;
+                }
+                if (awsListView.SelectedItems[1].Tag.GetType() == typeof(ZAwsElasticIp)
+                        && (!((ZAwsElasticIp)awsListView.SelectedItems[1].Tag).Associated)
+                        && awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsEc2))
+                {
+                    ip = (ZAwsElasticIp)awsListView.SelectedItems[1].Tag;
+                    ec2 = (ZAwsEc2)awsListView.SelectedItems[0].Tag;
+                }
+            }
+            if (ip == null || ec2 == null)
+            {
+                return;
+            }
+            ip.Associate(ec2);
+        }
+
+        private void buttonDnsNew_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void awsListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (awsListView.SelectedItems.Count != 1)
+            {
+                return;
+            }
+            ZAwsObject obj = (ZAwsObject)awsListView.SelectedItems[0].Tag;
+
+            if (obj.GetType() == typeof(ZAwsEc2) && ((ZAwsEc2)obj).Status == ZAwsEc2.Ec2Status.Running)
+            {
+                ((ZAwsEc2)obj).StartTerminal();
+            }
+        }
     }
 }

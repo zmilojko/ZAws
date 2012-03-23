@@ -10,6 +10,8 @@ using Amazon.EC2;
 using Amazon.EC2.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.CloudWatch;
+using Amazon.CloudWatch.Model;
 
 
 namespace ZAws
@@ -19,10 +21,12 @@ namespace ZAws
         string awsAccessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
         string awsSecretKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
         string awsEc2ZoneUrl = "https://eu-west-1.ec2.amazonaws.com";
+        string awsCloudWatchZoneUrl = "https://eu-west-1.monitoring.amazonaws.com/";
 
         internal AmazonEC2 ec2 {get; private set;}
         internal AmazonRoute53 route53 { get; private set; }
         internal AmazonS3 s3 { get; private set; }
+        internal AmazonCloudWatch CloudWatch;
 
         public ZAwsEc2Controller()
         {
@@ -52,6 +56,17 @@ namespace ZAws
         List<ZAwsSnapshot> currentSnapshots = new List<ZAwsSnapshot>();
         List<ZAwsAmi> currentAmis = new List<ZAwsAmi>();
         List<ZAwsEbsVolume> currentEbsVolumes = new List<ZAwsEbsVolume>();
+
+        public ZAwsEc2[] CurrentEc2s { get { return currentStatusEc2.ToArray(); } }
+        public ZAwsElasticIp[] CurrentElasticIps { get { return currentStatusElIps.ToArray(); } }
+        public ZAwsHostedZone[] CurrentHostedZones { get { return currentHostedZones.ToArray(); } }
+        public ZAwsS3[] CurrentS3Buckets { get { return currentS3Buckets.ToArray(); } }
+        public ZAwsSecGroup[] CurrentSecGroups { get { return currentSecGroups.ToArray(); } }
+        public ZAwsKeyPair[] CurrentKeyPairs { get { return currentKeyPairs.ToArray(); } }
+        public ZAwsSnapshot[] CurrentSnapshots { get { return currentSnapshots.ToArray(); } }
+        public ZAwsAmi[] CurrentAmis { get { return currentAmis.ToArray(); } }
+        public ZAwsEbsVolume[] CurrentEbsVolumes { get { return currentEbsVolumes.ToArray(); } }
+
 
         public ZAwsEc2 GetEc2(string InstanceId)
         {
@@ -85,6 +100,9 @@ namespace ZAws
 
             s3 = AWSClientFactory.CreateAmazonS3Client(awsAccessKey, awsSecretKey);
 
+            CloudWatch = AWSClientFactory.CreateAmazonCloudWatchClient(awsAccessKey, awsSecretKey,
+                        new AmazonCloudWatchConfig() { ServiceURL = awsCloudWatchZoneUrl });
+
             //Start the thread
             MonitoringThread = new Thread(new ThreadStart(MonitorFunction));
             RunMonitoring = true;
@@ -98,6 +116,7 @@ namespace ZAws
                 Debug.Assert(MonitoringThread != null);
                 Debug.Assert(route53 != null);
                 Debug.Assert(s3 != null);
+                Debug.Assert(CloudWatch != null);
 
                 bool killedTheThread = false;
                 //Shut the thread
@@ -120,6 +139,9 @@ namespace ZAws
 
                 s3.Dispose();
                 s3 = null;
+
+                CloudWatch.Dispose();
+                CloudWatch = null;
 
                 if (killedTheThread)
                 {
@@ -173,8 +195,15 @@ namespace ZAws
                 DescribeVolumesResponse respEbsVolumes = GetEbsVolumes();
                 UpdateClassOfObjects(currentEbsVolumes, respEbsVolumes.DescribeVolumesResult.Volume);
 
+
+                foreach (ZAwsEc2 ec2Instance in CurrentEc2s)
+                {
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    ec2Instance.UpdateInfo();
+                }
+
                 lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                
+
                 //Give ther threads a chance, and also allow user to smoothly disconnect
                 Thread.Sleep(200);
             }
@@ -309,5 +338,11 @@ namespace ZAws
             var resp = w.GetMetricStatistics(new Amazon.CloudWatch.Model.GetMetricStatisticsRequest());
             double b = resp.GetMetricStatisticsResult.Datapoints[0].Average;
         }*/
+
+        internal string AllocateIp()
+        {
+            AllocateAddressResponse resp = ec2.AllocateAddress(new AllocateAddressRequest());
+            return resp.AllocateAddressResult.PublicIp;
+        }
     }
 }

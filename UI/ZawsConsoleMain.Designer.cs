@@ -39,10 +39,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.buttonIpNew = new System.Windows.Forms.Button();
             this.buttonIpAssociate = new System.Windows.Forms.Button();
-            this.buttonIpDisassociate = new System.Windows.Forms.Button();
             this.DNS = new System.Windows.Forms.Label();
             this.buttonDnsNew = new System.Windows.Forms.Button();
-            this.buttonDnsRecords = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.buttonNewBucket = new System.Windows.Forms.Button();
             this.buttonBucketFileBrowser = new System.Windows.Forms.Button();
@@ -85,7 +83,7 @@
             // 
             // buttonDelete
             // 
-            this.buttonDelete.Location = new System.Drawing.Point(465, 439);
+            this.buttonDelete.Location = new System.Drawing.Point(465, 373);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(75, 23);
             this.buttonDelete.TabIndex = 1;
@@ -141,6 +139,7 @@
             this.buttonIpNew.TabIndex = 4;
             this.buttonIpNew.Text = "New IP";
             this.buttonIpNew.UseVisualStyleBackColor = true;
+            this.buttonIpNew.Click += new System.EventHandler(this.buttonIpNew_Click);
             // 
             // buttonIpAssociate
             // 
@@ -150,20 +149,12 @@
             this.buttonIpAssociate.TabIndex = 4;
             this.buttonIpAssociate.Text = "Associate";
             this.buttonIpAssociate.UseVisualStyleBackColor = true;
-            // 
-            // buttonIpDisassociate
-            // 
-            this.buttonIpDisassociate.Location = new System.Drawing.Point(464, 318);
-            this.buttonIpDisassociate.Name = "buttonIpDisassociate";
-            this.buttonIpDisassociate.Size = new System.Drawing.Size(75, 23);
-            this.buttonIpDisassociate.TabIndex = 4;
-            this.buttonIpDisassociate.Text = "Disassociate";
-            this.buttonIpDisassociate.UseVisualStyleBackColor = true;
+            this.buttonIpAssociate.Click += new System.EventHandler(this.buttonIpAssociate_Click);
             // 
             // DNS
             // 
             this.DNS.AutoSize = true;
-            this.DNS.Location = new System.Drawing.Point(461, 352);
+            this.DNS.Location = new System.Drawing.Point(461, 315);
             this.DNS.Name = "DNS";
             this.DNS.Size = new System.Drawing.Size(30, 13);
             this.DNS.TabIndex = 5;
@@ -171,21 +162,13 @@
             // 
             // buttonDnsNew
             // 
-            this.buttonDnsNew.Location = new System.Drawing.Point(464, 368);
+            this.buttonDnsNew.Location = new System.Drawing.Point(464, 331);
             this.buttonDnsNew.Name = "buttonDnsNew";
             this.buttonDnsNew.Size = new System.Drawing.Size(75, 23);
             this.buttonDnsNew.TabIndex = 6;
             this.buttonDnsNew.Text = "New Domain";
             this.buttonDnsNew.UseVisualStyleBackColor = true;
-            // 
-            // buttonDnsRecords
-            // 
-            this.buttonDnsRecords.Location = new System.Drawing.Point(465, 397);
-            this.buttonDnsRecords.Name = "buttonDnsRecords";
-            this.buttonDnsRecords.Size = new System.Drawing.Size(75, 23);
-            this.buttonDnsRecords.TabIndex = 6;
-            this.buttonDnsRecords.Text = "Records";
-            this.buttonDnsRecords.UseVisualStyleBackColor = true;
+            this.buttonDnsNew.Click += new System.EventHandler(this.buttonDnsNew_Click);
             // 
             // label3
             // 
@@ -198,6 +181,7 @@
             // 
             // buttonNewBucket
             // 
+            this.buttonNewBucket.Enabled = false;
             this.buttonNewBucket.Location = new System.Drawing.Point(464, 186);
             this.buttonNewBucket.Name = "buttonNewBucket";
             this.buttonNewBucket.Size = new System.Drawing.Size(75, 23);
@@ -207,6 +191,7 @@
             // 
             // buttonBucketFileBrowser
             // 
+            this.buttonBucketFileBrowser.Enabled = false;
             this.buttonBucketFileBrowser.Location = new System.Drawing.Point(464, 215);
             this.buttonBucketFileBrowser.Name = "buttonBucketFileBrowser";
             this.buttonBucketFileBrowser.Size = new System.Drawing.Size(75, 23);
@@ -217,7 +202,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(461, 423);
+            this.label4.Location = new System.Drawing.Point(461, 357);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(44, 13);
             this.label4.TabIndex = 5;
@@ -225,7 +210,6 @@
             // 
             // awsListView
             // 
-            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.awsListView.Location = new System.Drawing.Point(3, 0);
             this.awsListView.Name = "awsListView";
             this.awsListView.OwnerDraw = true;
@@ -235,6 +219,7 @@
             this.awsListView.View = System.Windows.Forms.View.Tile;
             this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
             this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
+            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
             // 
             // MainView
             // 
@@ -245,11 +230,9 @@
             this.Controls.Add(this.awsListView);
             this.Controls.Add(this.buttonBucketFileBrowser);
             this.Controls.Add(this.buttonNewBucket);
-            this.Controls.Add(this.buttonDnsRecords);
             this.Controls.Add(this.buttonDnsNew);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.DNS);
-            this.Controls.Add(this.buttonIpDisassociate);
             this.Controls.Add(this.buttonIpAssociate);
             this.Controls.Add(this.buttonIpNew);
             this.Controls.Add(this.label3);
@@ -287,10 +270,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button buttonIpNew;
         private System.Windows.Forms.Button buttonIpAssociate;
-        private System.Windows.Forms.Button buttonIpDisassociate;
         private System.Windows.Forms.Label DNS;
         private System.Windows.Forms.Button buttonDnsNew;
-        private System.Windows.Forms.Button buttonDnsRecords;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button buttonNewBucket;
         private System.Windows.Forms.Button buttonBucketFileBrowser;

@@ -56,5 +56,18 @@ namespace ZAws
             Amazon.EC2.Model.ReleaseAddressResponse resp = myController.ec2.ReleaseAddress(new Amazon.EC2.Model.ReleaseAddressRequest()
                                                                     .WithPublicIp(this.ResponseData.PublicIp));
         }
+
+        internal void Associate(ZAwsEc2 ec2)
+        {
+            Amazon.EC2.Model.AssociateAddressResponse resp = myController.ec2.AssociateAddress(new AssociateAddressRequest()
+                                                .WithPublicIp(this.Name)
+                                                .WithInstanceId(ec2.InstanceId));
+        }
+
+        internal void Disassociate()
+        {
+            Amazon.EC2.Model.DisassociateAddressResponse resp = myController.ec2.DisassociateAddress(new DisassociateAddressRequest()
+                                                .WithPublicIp(this.Name));
+        }
     }
 }
