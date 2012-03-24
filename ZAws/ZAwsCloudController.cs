@@ -22,6 +22,8 @@ namespace ZAws
         string awsSecretKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
         string awsEc2ZoneUrl = "https://eu-west-1.ec2.amazonaws.com";
         string awsCloudWatchZoneUrl = "https://eu-west-1.monitoring.amazonaws.com/";
+        string awsS3ZoneUrl = "s3.amazonaws.com";
+        string awsRoute53ZoneUrl = "https://route53.amazonaws.com";
 
         internal AmazonEC2 ec2 {get; private set;}
         internal AmazonRoute53 route53 { get; private set; }
@@ -80,6 +82,19 @@ namespace ZAws
             throw new ZAwsEInstanceNotFound("Cannot find an instance with ID " + InstanceId);
         }
 
+        public ZAwsHostedZone GetHostedZone(string PublicIp)
+        {
+            foreach (var z in CurrentHostedZones)
+            {
+                if (z.Name == PublicIp)
+                {
+                    return z;
+                }
+            }
+            throw new ZAwsEInstanceNotFound("Cannot find a zone with IP " + PublicIp);
+        }
+
+
         public void Connect()
         {
             if (ec2 != null)
@@ -96,9 +111,11 @@ namespace ZAws
             ec2 = AWSClientFactory.CreateAmazonEC2Client(awsAccessKey, awsSecretKey,
                         new AmazonEC2Config().WithServiceURL(awsEc2ZoneUrl));
 
-            route53 = AWSClientFactory.CreateAmazonRoute53Client(awsAccessKey, awsSecretKey);
+            route53 = AWSClientFactory.CreateAmazonRoute53Client(awsAccessKey, awsSecretKey,
+                            new AmazonRoute53Config() { ServiceURL = awsRoute53ZoneUrl });
 
-            s3 = AWSClientFactory.CreateAmazonS3Client(awsAccessKey, awsSecretKey);
+            s3 = AWSClientFactory.CreateAmazonS3Client(awsAccessKey, awsSecretKey,
+                            new AmazonS3Config().WithServiceURL(awsS3ZoneUrl));
 
             CloudWatch = AWSClientFactory.CreateAmazonCloudWatchClient(awsAccessKey, awsSecretKey,
                         new AmazonCloudWatchConfig() { ServiceURL = awsCloudWatchZoneUrl });
@@ -343,6 +360,14 @@ namespace ZAws
         {
             AllocateAddressResponse resp = ec2.AllocateAddress(new AllocateAddressRequest());
             return resp.AllocateAddressResult.PublicIp;
+        }
+
+        internal void CreatedHostedZone(string p)
+        {
+            CreateHostedZoneResponse resp = route53.CreateHostedZone(new CreateHostedZoneRequest()
+                                                                            .WithName(p)
+                                                                            .WithCallerReference("zawscc" + new Random().Next(1000).ToString())
+                                                                            );
         }
     }
 }

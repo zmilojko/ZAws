@@ -77,10 +77,11 @@
             // 
             // textBoxInstanceName
             // 
+            this.textBoxInstanceName.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxInstanceName.Location = new System.Drawing.Point(53, 12);
             this.textBoxInstanceName.Name = "textBoxInstanceName";
             this.textBoxInstanceName.Size = new System.Drawing.Size(162, 20);
-            this.textBoxInstanceName.TabIndex = 0;
+            this.textBoxInstanceName.TabIndex = 1;
             this.textBoxInstanceName.Text = "ZawsInstance";
             // 
             // label1
@@ -89,7 +90,7 @@
             this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 1;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Name";
             // 
             // comboBoxInstanceType
@@ -110,7 +111,7 @@
             this.comboBoxInstanceType.Location = new System.Drawing.Point(53, 38);
             this.comboBoxInstanceType.Name = "comboBoxInstanceType";
             this.comboBoxInstanceType.Size = new System.Drawing.Size(162, 21);
-            this.comboBoxInstanceType.TabIndex = 2;
+            this.comboBoxInstanceType.TabIndex = 3;
             // 
             // label2
             // 
@@ -118,7 +119,7 @@
             this.label2.Location = new System.Drawing.Point(16, 41);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(31, 13);
-            this.label2.TabIndex = 1;
+            this.label2.TabIndex = 2;
             this.label2.Text = "Type";
             // 
             // comboBoxKeyPair
@@ -128,7 +129,7 @@
             this.comboBoxKeyPair.Location = new System.Drawing.Point(295, 12);
             this.comboBoxKeyPair.Name = "comboBoxKeyPair";
             this.comboBoxKeyPair.Size = new System.Drawing.Size(162, 21);
-            this.comboBoxKeyPair.TabIndex = 2;
+            this.comboBoxKeyPair.TabIndex = 7;
             // 
             // label3
             // 
@@ -136,7 +137,7 @@
             this.label3.Location = new System.Drawing.Point(247, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(42, 13);
-            this.label3.TabIndex = 1;
+            this.label3.TabIndex = 6;
             this.label3.Text = "Keypair";
             // 
             // comboBoxSecGroup
@@ -146,7 +147,7 @@
             this.comboBoxSecGroup.Location = new System.Drawing.Point(295, 39);
             this.comboBoxSecGroup.Name = "comboBoxSecGroup";
             this.comboBoxSecGroup.Size = new System.Drawing.Size(162, 21);
-            this.comboBoxSecGroup.TabIndex = 2;
+            this.comboBoxSecGroup.TabIndex = 9;
             // 
             // label4
             // 
@@ -154,7 +155,7 @@
             this.label4.Location = new System.Drawing.Point(230, 41);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(59, 13);
-            this.label4.TabIndex = 1;
+            this.label4.TabIndex = 8;
             this.label4.Text = "Sec. group";
             // 
             // comboBoxRegion
@@ -172,7 +173,7 @@
             this.comboBoxRegion.Location = new System.Drawing.Point(53, 65);
             this.comboBoxRegion.Name = "comboBoxRegion";
             this.comboBoxRegion.Size = new System.Drawing.Size(162, 21);
-            this.comboBoxRegion.TabIndex = 2;
+            this.comboBoxRegion.TabIndex = 5;
             // 
             // label5
             // 
@@ -180,7 +181,7 @@
             this.label5.Location = new System.Drawing.Point(6, 68);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(41, 13);
-            this.label5.TabIndex = 1;
+            this.label5.TabIndex = 4;
             this.label5.Text = "Region";
             // 
             // buttonLaunch
@@ -188,7 +189,7 @@
             this.buttonLaunch.Location = new System.Drawing.Point(489, 10);
             this.buttonLaunch.Name = "buttonLaunch";
             this.buttonLaunch.Size = new System.Drawing.Size(75, 23);
-            this.buttonLaunch.TabIndex = 3;
+            this.buttonLaunch.TabIndex = 13;
             this.buttonLaunch.Text = "Launch";
             this.buttonLaunch.UseVisualStyleBackColor = true;
             this.buttonLaunch.Click += new System.EventHandler(this.buttonLaunch_Click);
@@ -199,7 +200,7 @@
             this.buttonCancel.Location = new System.Drawing.Point(489, 39);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
-            this.buttonCancel.TabIndex = 3;
+            this.buttonCancel.TabIndex = 14;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             // 
@@ -209,7 +210,7 @@
             this.label6.Location = new System.Drawing.Point(263, 68);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(26, 13);
-            this.label6.TabIndex = 1;
+            this.label6.TabIndex = 10;
             this.label6.Text = "AMI";
             // 
             // comboBoxAmi
@@ -219,7 +220,7 @@
             this.comboBoxAmi.Location = new System.Drawing.Point(295, 66);
             this.comboBoxAmi.Name = "comboBoxAmi";
             this.comboBoxAmi.Size = new System.Drawing.Size(162, 21);
-            this.comboBoxAmi.TabIndex = 2;
+            this.comboBoxAmi.TabIndex = 11;
             // 
             // tabPage3
             // 
@@ -255,7 +256,7 @@
             this.button3.Location = new System.Drawing.Point(498, 30);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(46, 23);
-            this.button3.TabIndex = 8;
+            this.button3.TabIndex = 4;
             this.button3.Text = ". . .";
             this.button3.UseVisualStyleBackColor = true;
             // 
@@ -264,7 +265,7 @@
             this.button2.Location = new System.Drawing.Point(407, 157);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(137, 23);
-            this.button2.TabIndex = 7;
+            this.button2.TabIndex = 15;
             this.button2.Text = "Include in the server";
             this.button2.UseVisualStyleBackColor = true;
             // 
@@ -274,7 +275,7 @@
             this.label13.Location = new System.Drawing.Point(3, 346);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(128, 13);
-            this.label13.TabIndex = 6;
+            this.label13.TabIndex = 17;
             this.label13.Text = "Applications to download:";
             // 
             // listView1
@@ -286,7 +287,7 @@
             this.listView1.Location = new System.Drawing.Point(137, 346);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(407, 82);
-            this.listView1.TabIndex = 5;
+            this.listView1.TabIndex = 18;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             // 
@@ -314,7 +315,7 @@
             this.comboBoxGitAppType.Location = new System.Drawing.Point(139, 159);
             this.comboBoxGitAppType.Name = "comboBoxGitAppType";
             this.comboBoxGitAppType.Size = new System.Drawing.Size(121, 21);
-            this.comboBoxGitAppType.TabIndex = 4;
+            this.comboBoxGitAppType.TabIndex = 14;
             // 
             // label11
             // 
@@ -322,7 +323,7 @@
             this.label11.Location = new System.Drawing.Point(2, 183);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(545, 143);
-            this.label11.TabIndex = 3;
+            this.label11.TabIndex = 16;
             this.label11.Text = resources.GetString("label11.Text");
             // 
             // checkBoxGitAppDefaultServerApp
@@ -331,7 +332,7 @@
             this.checkBoxGitAppDefaultServerApp.Location = new System.Drawing.Point(364, 110);
             this.checkBoxGitAppDefaultServerApp.Name = "checkBoxGitAppDefaultServerApp";
             this.checkBoxGitAppDefaultServerApp.Size = new System.Drawing.Size(164, 17);
-            this.checkBoxGitAppDefaultServerApp.TabIndex = 2;
+            this.checkBoxGitAppDefaultServerApp.TabIndex = 10;
             this.checkBoxGitAppDefaultServerApp.Text = "Default application on server.";
             this.checkBoxGitAppDefaultServerApp.UseVisualStyleBackColor = true;
             // 
@@ -343,7 +344,7 @@
             this.checkBoxGitAppCheckRepoPublicKey.Location = new System.Drawing.Point(14, 133);
             this.checkBoxGitAppCheckRepoPublicKey.Name = "checkBoxGitAppCheckRepoPublicKey";
             this.checkBoxGitAppCheckRepoPublicKey.Size = new System.Drawing.Size(191, 17);
-            this.checkBoxGitAppCheckRepoPublicKey.TabIndex = 2;
+            this.checkBoxGitAppCheckRepoPublicKey.TabIndex = 11;
             this.checkBoxGitAppCheckRepoPublicKey.Text = "Check repo\'s public key fingerprint:";
             this.checkBoxGitAppCheckRepoPublicKey.UseVisualStyleBackColor = true;
             // 
@@ -355,7 +356,7 @@
             this.checkBoxGitAppDnsRecord.Location = new System.Drawing.Point(139, 110);
             this.checkBoxGitAppDnsRecord.Name = "checkBoxGitAppDnsRecord";
             this.checkBoxGitAppDnsRecord.Size = new System.Drawing.Size(219, 17);
-            this.checkBoxGitAppDnsRecord.TabIndex = 2;
+            this.checkBoxGitAppDnsRecord.TabIndex = 9;
             this.checkBoxGitAppDnsRecord.Text = "Check/create DNS record and Elastic IP";
             this.checkBoxGitAppDnsRecord.UseVisualStyleBackColor = true;
             // 
@@ -365,7 +366,7 @@
             this.label12.Location = new System.Drawing.Point(48, 162);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(85, 13);
-            this.label12.TabIndex = 1;
+            this.label12.TabIndex = 13;
             this.label12.Text = "Application type:";
             // 
             // label10
@@ -374,7 +375,7 @@
             this.label10.Location = new System.Drawing.Point(49, 87);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(84, 13);
-            this.label10.TabIndex = 1;
+            this.label10.TabIndex = 7;
             this.label10.Text = "Application URL";
             // 
             // label9
@@ -383,7 +384,7 @@
             this.label9.Location = new System.Drawing.Point(73, 61);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(60, 13);
-            this.label9.TabIndex = 1;
+            this.label9.TabIndex = 5;
             this.label9.Text = "Destination";
             // 
             // label8
@@ -392,7 +393,7 @@
             this.label8.Location = new System.Drawing.Point(57, 35);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(76, 13);
-            this.label8.TabIndex = 1;
+            this.label8.TabIndex = 2;
             this.label8.Text = "Private key file";
             // 
             // label7
@@ -401,44 +402,49 @@
             this.label7.Location = new System.Drawing.Point(64, 9);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(69, 13);
-            this.label7.TabIndex = 1;
+            this.label7.TabIndex = 0;
             this.label7.Text = "App. location";
             // 
             // textBoxGitAppRepoPublicKeyFingerprint
             // 
+            this.textBoxGitAppRepoPublicKeyFingerprint.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxGitAppRepoPublicKeyFingerprint.Location = new System.Drawing.Point(211, 133);
             this.textBoxGitAppRepoPublicKeyFingerprint.Name = "textBoxGitAppRepoPublicKeyFingerprint";
             this.textBoxGitAppRepoPublicKeyFingerprint.Size = new System.Drawing.Size(333, 20);
-            this.textBoxGitAppRepoPublicKeyFingerprint.TabIndex = 0;
+            this.textBoxGitAppRepoPublicKeyFingerprint.TabIndex = 12;
             this.textBoxGitAppRepoPublicKeyFingerprint.Text = "16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48";
             // 
             // textBoxGitAppUrl
             // 
+            this.textBoxGitAppUrl.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxGitAppUrl.Location = new System.Drawing.Point(139, 84);
             this.textBoxGitAppUrl.Name = "textBoxGitAppUrl";
             this.textBoxGitAppUrl.Size = new System.Drawing.Size(405, 20);
-            this.textBoxGitAppUrl.TabIndex = 0;
+            this.textBoxGitAppUrl.TabIndex = 8;
             // 
             // textBoxGitApp
             // 
+            this.textBoxGitApp.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxGitApp.Location = new System.Drawing.Point(139, 58);
             this.textBoxGitApp.Name = "textBoxGitApp";
             this.textBoxGitApp.Size = new System.Drawing.Size(405, 20);
-            this.textBoxGitApp.TabIndex = 0;
+            this.textBoxGitApp.TabIndex = 6;
             // 
             // textBoxGitAppPrivateKey
             // 
+            this.textBoxGitAppPrivateKey.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxGitAppPrivateKey.Location = new System.Drawing.Point(139, 32);
             this.textBoxGitAppPrivateKey.Name = "textBoxGitAppPrivateKey";
             this.textBoxGitAppPrivateKey.Size = new System.Drawing.Size(353, 20);
-            this.textBoxGitAppPrivateKey.TabIndex = 0;
+            this.textBoxGitAppPrivateKey.TabIndex = 3;
             // 
             // textBoxGitAppLocation
             // 
+            this.textBoxGitAppLocation.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxGitAppLocation.Location = new System.Drawing.Point(139, 6);
             this.textBoxGitAppLocation.Name = "textBoxGitAppLocation";
             this.textBoxGitAppLocation.Size = new System.Drawing.Size(405, 20);
-            this.textBoxGitAppLocation.TabIndex = 0;
+            this.textBoxGitAppLocation.TabIndex = 1;
             // 
             // tabPage1
             // 
@@ -463,6 +469,7 @@
             // 
             // textBoxStrtupScript
             // 
+            this.textBoxStrtupScript.BackColor = System.Drawing.Color.LightCyan;
             this.textBoxStrtupScript.Location = new System.Drawing.Point(6, 6);
             this.textBoxStrtupScript.Multiline = true;
             this.textBoxStrtupScript.Name = "textBoxStrtupScript";
@@ -477,7 +484,7 @@
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(558, 457);
-            this.tabControl1.TabIndex = 4;
+            this.tabControl1.TabIndex = 12;
             // 
             // DlgLaunchNewInstance
             // 

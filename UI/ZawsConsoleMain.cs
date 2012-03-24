@@ -50,7 +50,7 @@ namespace ZAws.Console
             }
 
             ListViewGroup g;
-            if (e.NewObject.GetType() == typeof(ZAwsEc2) || e.NewObject.GetType() == typeof(ZAwsElasticIp))
+            if (e.NewObject.GetType() == typeof(ZAwsEc2))
             {
                 g = awsListView.Groups["EC2"];
                 awsListView.ShowGroups = true;
@@ -192,7 +192,10 @@ namespace ZAws.Console
                             e.Graphics.DrawString(string.Format("CPU: {0}", (healthy ? "healthy" : "rough")),
                                             NameFont, (healthy ? Brushes.DarkGreen : Brushes.Red), DetailsSpace1);
                             e.Graphics.DrawString(string.Format("^{0}% >{1}%", ec2.CPUUtilizationMax, ec2.CPUUtilizationAvg),
-                                            NameFont, (healthy ? Brushes.DarkGreen : Brushes.Red), DetailsSpace2); 
+                                            NameFont, (healthy ? Brushes.DarkGreen : Brushes.Red), DetailsSpace2);
+
+                            e.Graphics.DrawString(string.Format("NET: {0}", ec2.NetworkOutRecent5MinString),
+                                            NameFont, Brushes.Black, DetailsSpace3);
 
                         }
                         break;
@@ -511,7 +514,7 @@ namespace ZAws.Console
 
         private void buttonDnsNew_Click(object sender, EventArgs e)
         {
-
+            new DlgNewHostedZone(controller).ShowDialog();
         }
 
         private void awsListView_DoubleClick(object sender, EventArgs e)

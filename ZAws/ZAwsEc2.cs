@@ -136,10 +136,35 @@ namespace ZAws
         public bool StatisticsValid { get; private set; }
         public int CPUUtilizationMax { get; private set; }
         public int CPUUtilizationAvg { get; private set; }
+        public int NetworkOutRecent5Min { get; private set; }
+        public string NetworkOutRecent5MinString
+        {
+            get
+            {
+                if (NetworkOutRecent5Min < 1000)
+                {
+                    return NetworkOutRecent5Min.ToString() + "B";
+                }
+                if (NetworkOutRecent5Min < 10000)
+                {
+                    return (NetworkOutRecent5Min / 1000).ToString() + "." + ((NetworkOutRecent5Min % 1000) / 100).ToString() + "KB";
+                }
+                if (NetworkOutRecent5Min < 500000)
+                {
+                    return (NetworkOutRecent5Min / 1000).ToString() + "KB";
+                }
+                if (NetworkOutRecent5Min < 10000000)
+                {
+                    return (NetworkOutRecent5Min / 1000000).ToString() + "." + ((NetworkOutRecent5Min % 1000000) / 100000).ToString() + "MB";
+                }
+                return (NetworkOutRecent5Min / 1000000).ToString() + "MB";
+            }
+        }
 
 
         internal void UpdateInfo()
         {
+            bool Change = false;
             /*
             var resp = myController.CloudWatch.ListMetrics(new Amazon.CloudWatch.Model.ListMetricsRequest()
             
@@ -170,17 +195,45 @@ namespace ZAws
                 if (CPUUtilizationTemp != CPUUtilizationMax)
                 {
                     CPUUtilizationMax = CPUUtilizationTemp;
-                    this.TriggerStatusChanged();
+                    Change = true;
                 } 
                 CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Average;
                 if (CPUUtilizationTemp != CPUUtilizationAvg)
                 {
                     CPUUtilizationAvg = CPUUtilizationTemp;
-                    this.TriggerStatusChanged();
+                    Change = true;
                 }
                 StatisticsValid = true;
             }
-         
+
+            var resp3 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
+                                                                .WithNamespace("AWS/EC2")
+
+                                                                .WithDimensions(new Dimension()
+                                                                                            .WithName("InstanceId")
+                                                                                            .WithValue(this.InstanceId))
+
+                                                                .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
+                                                                .WithEndTime(DateTime.Now.ToUniversalTime())
+                                                                .WithPeriod(300)
+                                                                .WithMetricName("NetworkOut")
+                                                                .WithUnit("Bytes")
+                                                                .WithStatistics("Sum"));
+            if (resp3.GetMetricStatisticsResult.Datapoints.Count > 0)
+            {
+                int NetworkOutRecent5MinTemp = (int)resp3.GetMetricStatisticsResult.Datapoints[resp3.GetMetricStatisticsResult.Datapoints.Count - 1].Sum;
+                if (NetworkOutRecent5MinTemp != NetworkOutRecent5Min)
+                {
+                    NetworkOutRecent5Min = NetworkOutRecent5MinTemp;
+                    Change = true;
+                }
+                StatisticsValid = true;
+            }
+
+            if (Change)
+            {
+                this.TriggerStatusChanged();
+            }
         }
     }
 }
