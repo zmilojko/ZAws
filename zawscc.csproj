@@ -101,6 +101,12 @@
     <Compile Include="UI\DlgNewHostedZone.Designer.cs">
       <DependentUpon>DlgNewHostedZone.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\DlgViewDnsRecords.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\DlgViewDnsRecords.Designer.cs">
+      <DependentUpon>DlgViewDnsRecords.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\ZAwsListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -170,6 +176,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\DlgNewHostedZone.resx">
       <DependentUpon>DlgNewHostedZone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\DlgViewDnsRecords.resx">
+      <DependentUpon>DlgViewDnsRecords.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ZawsConsoleMain.resx">
       <DependentUpon>ZawsConsoleMain.cs</DependentUpon>

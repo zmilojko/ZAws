@@ -82,9 +82,9 @@ namespace ZAws
             throw new ZAwsEInstanceNotFound("Cannot find an instance with ID " + InstanceId);
         }
 
-        public ZAwsHostedZone GetHostedZone(string PublicIp)
+        public ZAwsElasticIp GetElasticIp(string PublicIp)
         {
-            foreach (var z in CurrentHostedZones)
+            foreach (var z in CurrentElasticIps)
             {
                 if (z.Name == PublicIp)
                 {
@@ -217,6 +217,12 @@ namespace ZAws
                 {
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     ec2Instance.UpdateInfo();
+                } 
+                
+                foreach (ZAwsHostedZone zone in CurrentHostedZones)
+                {
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    zone.UpdateInfo();
                 }
 
                 lock (Ec2Lock) { if (!RunMonitoring) { return; } }

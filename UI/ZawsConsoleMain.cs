@@ -174,6 +174,7 @@ namespace ZAws.Console
             Rectangle DetailsSpace1 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 42, 100, 30);
             Rectangle DetailsSpace2 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 54, 100, 30);
             Rectangle DetailsSpace3 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 66, 100, 30);
+            Rectangle DetailsSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 42, e.Bounds.Width - 4, e.Bounds.Height - 44);
 
             e.Graphics.DrawString(obj.Name, NameFont, Brushes.DarkBlue, NameSpace);
 
@@ -244,7 +245,19 @@ namespace ZAws.Console
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsHostedZone))
             {
+                ZAwsHostedZone z = (ZAwsHostedZone)obj;
                 e.Graphics.DrawString("DNS", IconFont, Brushes.Blue, IconSpace);
+
+                string det = "";
+                foreach(var s in z.Targets)
+                {
+                    if(!string.IsNullOrWhiteSpace(det)) det += "\r\n";
+                    det += "=> " + s;
+                }
+                if (!string.IsNullOrWhiteSpace(det))
+                {
+                    e.Graphics.DrawString(det, NameFont, Brushes.Black, DetailsSpace);
+                }
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsSnapshot))
             {
@@ -440,12 +453,14 @@ namespace ZAws.Console
         {
             foreach (ListViewItem item in awsListView.SelectedItems)
             {
-                var response = MessageBox.Show(string.Format("Are yo usure you want to permanently delete object {1} of type {0}?",
+                var response = MessageBox.Show(string.Format("Are yo usure you want to permanently delete object {0} of type {1}?",
                     ((ZAwsObject)item.Tag).Name, item.Tag.GetType()), "Confirm deletion - this cannot be undone!", MessageBoxButtons.YesNo,
                     MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
                 if (response == System.Windows.Forms.DialogResult.Yes)
                 {
                     ((ZAwsObject)item.Tag).DeleteObject();
+                    awsListView.SelectedItems.Clear();
+                    awsListView_SelectedIndexChanged(sender, e);
                 }
             }
         }
@@ -528,6 +543,12 @@ namespace ZAws.Console
             if (obj.GetType() == typeof(ZAwsEc2) && ((ZAwsEc2)obj).Status == ZAwsEc2.Ec2Status.Running)
             {
                 ((ZAwsEc2)obj).StartTerminal();
+                return;
+            }
+            if (obj.GetType() == typeof(ZAwsHostedZone))
+            {
+                new DlgViewDnsRecords(controller, (ZAwsHostedZone)obj).ShowDialog();
+                return;
             }
         }
     }
