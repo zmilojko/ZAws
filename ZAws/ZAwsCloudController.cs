@@ -176,6 +176,21 @@ namespace ZAws
         {
             while (true)
             {
+                //TEST ZONE
+                {
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    ListHostedZonesResponse route53Zones2 = GetHostedZones();
+                    UpdateClassOfObjects(currentHostedZones, route53Zones2.ListHostedZonesResult.HostedZones);
+
+                    foreach (ZAwsHostedZone zone in CurrentHostedZones)
+                    {
+                        lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                        zone.UpdateInfo();
+                    }
+                }
+                //Now continues normally
+
+
                 lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                 DescribeInstancesResponse respEc2 = GetRunningInstances();
                 UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
@@ -217,8 +232,8 @@ namespace ZAws
                 {
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     ec2Instance.UpdateInfo();
-                } 
-                
+                }
+
                 foreach (ZAwsHostedZone zone in CurrentHostedZones)
                 {
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }

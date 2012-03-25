@@ -547,7 +547,10 @@ namespace ZAws.Console
             }
             if (obj.GetType() == typeof(ZAwsHostedZone))
             {
-                new DlgViewDnsRecords(controller, (ZAwsHostedZone)obj).ShowDialog();
+                if(((ZAwsHostedZone)obj).RecordsAvailable)
+                {
+                    new DlgViewDnsRecords(controller, (ZAwsHostedZone)obj).ShowDialog();
+                }
                 return;
             }
         }

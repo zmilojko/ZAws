@@ -15,6 +15,7 @@ namespace ZAws
             : base(controller)
         {
             Update(res);
+            RecordsAvailable = false;
         }
 
         public override string Name
@@ -46,7 +47,9 @@ namespace ZAws
         }
 
         internal List<ResourceRecordSet> currentRecordSet = new List<ResourceRecordSet>();
-        
+
+
+        public bool RecordsAvailable { get; private set; }
         internal void UpdateInfo()
         {
             ListResourceRecordSetsResponse resp = myController.route53.ListResourceRecordSets(new ListResourceRecordSetsRequest()
@@ -96,6 +99,7 @@ namespace ZAws
 
             if (Change)
             {
+                RecordsAvailable = true;
                 currentRecordSet = resp.ListResourceRecordSetsResult.ResourceRecordSets;
                 TriggerStatusChanged();
             }            
@@ -144,6 +148,19 @@ namespace ZAws
                 }
                 return targetList.ToArray();
             }
+        }
+
+        internal void DeleteRecord(ResourceRecordSet s)
+        {
+            ChangeResourceRecordSetsResponse resp = 
+            myController.route53.ChangeResourceRecordSets(new ChangeResourceRecordSetsRequest()
+                                                                .WithHostedZoneId(this.ResponseData.Id)
+                                                                .WithChangeBatch(new ChangeBatch()
+                                                                                    .WithChanges(
+                                                                                        new Change()
+                                                                                            .WithAction("DELETE")
+                                                                                            .WithResourceRecordSet(s))));
+            UpdateInfo();
         }
     }
 }

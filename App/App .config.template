@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration>
+	<appSettings>
+		<add key="AWSAccessKey" value="UPIR_ACCESS_KEY"/>
+		<add key="AWSSecretKey" value="YOUR SECRET KEY"/>
+    <add key="SSHPrivateKeysDir" value="C:\Users\YOUR USERNAME\.ssh\"/>
+    <add key="SSHTerminalApp" value="C:\Program Files (x86)\PuTTY\putty.exe"/>
+    <add key="SSHTerminaAppArgs" value="-ssh -i {1} ec2-user@{0}"/>
+    <add key="SSHFileBrowserApp" value="C:\Program Files (x86)\WinSCP\WinSCP.exe"/>
+    <add key="SSHFileBrowserAppArgs" value="/privatekey={1}   ec2-user@{0}"/>
+  </appSettings>
+  <startup>
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0"/>
+  </startup>
+</configuration>
