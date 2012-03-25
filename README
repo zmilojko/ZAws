@@ -5,3 +5,17 @@ This application provides OO .NET Interface towards AWS API and a simple UI that
 To use it, modify the App.Config file to contain your keys and regions and then rebuild the application and start it.
 
 The goal of the project is to eventually suport all services and all features of AWS that Z-Ware itself is using. The projects starts with EC2, S3, IAM and Route53.
+
+Notes:
+
+- At this point this application works only with the Europe region servers (where it matters). Global support will be added later.
+- We do not YET handle exceptions properly.
+
+========================================
+
+INSTRUCTIONS
+
+1. Rename App/App.config.template to App/App.config. Open it and type in your AWS access key and secret key. (You can find those here: https://aws-portal.amazon.com/gp/aws/securityCredentials.)
+2. Check all other settings in the App.config file, though application should generally work even if those settings are incorrect, or if you for instance do not even have an SSH client, although obviously SSH terminal launching will fails.
+3. You need to download and install AWS .NET SDK. (You can find that here: http://aws.amazon.com/sdkfornet/.)
+4. Program should now build and start OK in Visual Studio 2010 (not tested in Express edition).
