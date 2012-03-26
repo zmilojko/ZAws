@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace ZAws.Console
 {
@@ -68,8 +69,9 @@ namespace ZAws.Console
                     Amazon.Route53.Model.ResourceRecordSet s = (Amazon.Route53.Model.ResourceRecordSet)item.Tag;
                     MyZone.DeleteRecord(s);
                 }
+                ShowItems();
             }
-            ShowItems();
+            
         }
 
         private void listViewRecrods_SelectedIndexChanged(object sender, EventArgs e)
@@ -86,7 +88,23 @@ namespace ZAws.Console
                 DlgEditDnsRecord dlg = new DlgEditDnsRecord(MyController, set);
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    //now should update
+                    Amazon.Route53.Model.ChangeResourceRecordSetsResponse resp = 
+                    MyController.route53.ChangeResourceRecordSets(new Amazon.Route53.Model.ChangeResourceRecordSetsRequest()
+                        .WithHostedZoneId(this.MyZone.ResponseData.Id)
+                        .WithChangeBatch(new Amazon.Route53.Model.ChangeBatch()
+                                .WithChanges(new Amazon.Route53.Model.Change()
+                                                   .WithAction("DELETE")
+                                                   .WithResourceRecordSet(set),
+                                             new Amazon.Route53.Model.Change()
+                                                   .WithAction("CREATE")
+                                                   .WithResourceRecordSet(new Amazon.Route53.Model.ResourceRecordSet()
+                                                      .WithName(dlg.textBoxName.Text)
+                                                      .WithType(dlg.comboBoxRecordType.Text)
+                                                      .WithTTL(Convert.ToInt32(dlg.textBoxTTL.Text))
+                                                      .WithResourceRecords(dlg.CurrentResourceRecords)))));
+                    Thread.Sleep(2000);
+                    MyZone.UpdateInfo();
+                    ShowItems();
                 }
             }
         }
@@ -94,10 +112,17 @@ namespace ZAws.Console
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             Amazon.Route53.Model.ResourceRecordSet set = new Amazon.Route53.Model.ResourceRecordSet();
-            if (new DlgEditDnsRecord(MyController, set).ShowDialog() == DialogResult.OK)
+            DlgEditDnsRecord dlg = new DlgEditDnsRecord(MyController, set);
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
-                //now should add
+                MyZone.AddRecord(new Amazon.Route53.Model.ResourceRecordSet()
+                                                    .WithName(dlg.textBoxName.Text)
+                                                    .WithType(dlg.comboBoxRecordType.Text)
+                                                    .WithTTL(Convert.ToInt32(dlg.textBoxTTL.Text))
+                                                    .WithResourceRecords(dlg.CurrentResourceRecords));
+                ShowItems();
             }
+            
         }
     }
 }

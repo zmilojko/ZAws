@@ -41,6 +41,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.listBoxOptions = new System.Windows.Forms.ListBox();
             this.buttonInsertSelectedOption = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonClose
@@ -49,19 +50,21 @@
             this.buttonClose.Location = new System.Drawing.Point(549, 209);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(75, 23);
-            this.buttonClose.TabIndex = 1;
+            this.buttonClose.TabIndex = 11;
             this.buttonClose.Text = "Close";
             this.buttonClose.UseVisualStyleBackColor = true;
             this.buttonClose.Click += new System.EventHandler(this.button1_Click);
             // 
             // buttonOK
             // 
+            this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonOK.Location = new System.Drawing.Point(468, 209);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
-            this.buttonOK.TabIndex = 1;
+            this.buttonOK.TabIndex = 10;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
+            this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
             // 
             // label1
             // 
@@ -69,7 +72,7 @@
             this.label1.Location = new System.Drawing.Point(51, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 2;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Name";
             // 
             // textBoxName
@@ -77,7 +80,7 @@
             this.textBoxName.Location = new System.Drawing.Point(92, 12);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(100, 20);
-            this.textBoxName.TabIndex = 3;
+            this.textBoxName.TabIndex = 1;
             // 
             // comboBoxRecordType
             // 
@@ -98,7 +101,7 @@
             this.comboBoxRecordType.Location = new System.Drawing.Point(92, 38);
             this.comboBoxRecordType.Name = "comboBoxRecordType";
             this.comboBoxRecordType.Size = new System.Drawing.Size(72, 21);
-            this.comboBoxRecordType.TabIndex = 4;
+            this.comboBoxRecordType.TabIndex = 3;
             this.comboBoxRecordType.SelectedIndexChanged += new System.EventHandler(this.comboBoxRecordType_SelectedIndexChanged);
             // 
             // textBoxValue
@@ -107,7 +110,7 @@
             this.textBoxValue.Multiline = true;
             this.textBoxValue.Name = "textBoxValue";
             this.textBoxValue.Size = new System.Drawing.Size(248, 95);
-            this.textBoxValue.TabIndex = 3;
+            this.textBoxValue.TabIndex = 5;
             // 
             // label2
             // 
@@ -124,7 +127,7 @@
             this.label3.Location = new System.Drawing.Point(52, 68);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(34, 13);
-            this.label3.TabIndex = 2;
+            this.label3.TabIndex = 4;
             this.label3.Text = "Value";
             // 
             // textBoxTTL
@@ -132,7 +135,7 @@
             this.textBoxTTL.Location = new System.Drawing.Point(92, 166);
             this.textBoxTTL.Name = "textBoxTTL";
             this.textBoxTTL.Size = new System.Drawing.Size(100, 20);
-            this.textBoxTTL.TabIndex = 3;
+            this.textBoxTTL.TabIndex = 9;
             // 
             // label4
             // 
@@ -140,7 +143,7 @@
             this.label4.Location = new System.Drawing.Point(59, 169);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(27, 13);
-            this.label4.TabIndex = 2;
+            this.label4.TabIndex = 8;
             this.label4.Text = "TTL";
             // 
             // listBoxOptions
@@ -150,7 +153,7 @@
             this.listBoxOptions.Name = "listBoxOptions";
             this.listBoxOptions.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.listBoxOptions.Size = new System.Drawing.Size(234, 95);
-            this.listBoxOptions.TabIndex = 5;
+            this.listBoxOptions.TabIndex = 7;
             this.listBoxOptions.SelectedIndexChanged += new System.EventHandler(this.listBoxOptions_SelectedIndexChanged);
             // 
             // buttonInsertSelectedOption
@@ -164,6 +167,15 @@
             this.buttonInsertSelectedOption.UseVisualStyleBackColor = true;
             this.buttonInsertSelectedOption.Click += new System.EventHandler(this.buttonInsertSelectedOption_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(387, 46);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(93, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Some suggestions";
+            // 
             // DlgEditDnsRecord
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -171,6 +183,7 @@
             this.BackColor = System.Drawing.Color.White;
             this.CancelButton = this.buttonClose;
             this.ClientSize = new System.Drawing.Size(636, 244);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.buttonInsertSelectedOption);
             this.Controls.Add(this.listBoxOptions);
             this.Controls.Add(this.comboBoxRecordType);
@@ -198,14 +211,15 @@
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBoxName;
-        private System.Windows.Forms.ComboBox comboBoxRecordType;
-        private System.Windows.Forms.TextBox textBoxValue;
+        internal System.Windows.Forms.TextBox textBoxName;
+        internal System.Windows.Forms.ComboBox comboBoxRecordType;
+        internal System.Windows.Forms.TextBox textBoxValue;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBoxTTL;
+        internal System.Windows.Forms.TextBox textBoxTTL;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ListBox listBoxOptions;
         private System.Windows.Forms.Button buttonInsertSelectedOption;
+        private System.Windows.Forms.Label label5;
     }
 }

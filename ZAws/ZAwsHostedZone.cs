@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Amazon.Route53.Model;
+using System.Threading;
 
 namespace ZAws
 {
@@ -150,6 +151,20 @@ namespace ZAws
             }
         }
 
+        internal void AddRecord(ResourceRecordSet s)
+        {
+            ChangeResourceRecordSetsResponse resp =
+            myController.route53.ChangeResourceRecordSets(new ChangeResourceRecordSetsRequest()
+                                                                .WithHostedZoneId(this.ResponseData.Id)
+                                                                .WithChangeBatch(new ChangeBatch()
+                                                                                    .WithChanges(
+                                                                                        new Change()
+                                                                                            .WithAction("CREATE")
+                                                                                            .WithResourceRecordSet(s))));
+            Thread.Sleep(2000);
+            UpdateInfo();
+        }
+
         internal void DeleteRecord(ResourceRecordSet s)
         {
             ChangeResourceRecordSetsResponse resp = 
@@ -160,6 +175,7 @@ namespace ZAws
                                                                                         new Change()
                                                                                             .WithAction("DELETE")
                                                                                             .WithResourceRecordSet(s))));
+            Thread.Sleep(2000);
             UpdateInfo();
         }
     }

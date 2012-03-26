@@ -30,26 +30,42 @@ namespace ZAws.Console
 
         private void DlgEditDnsRecord_Load(object sender, EventArgs e)
         {
-            textBoxName.Text = MyRecords.Name;
-            string s = "";
-            foreach (var v in MyRecords.ResourceRecords)
-            {
-                if (!string.IsNullOrWhiteSpace(s)) { s += "\n"; }
-                s += v.Value;
-            }
-            textBoxValue.Text = s;
-            textBoxTTL.Text = MyRecords.TTL.ToString();
-            comboBoxRecordType.Text = MyRecords.Type;
-            comboBoxRecordType_SelectedIndexChanged(null, null);
-
-            if (MyRecords.Type == "SOA" || MyRecords.Type == "NS")
+            if (!string.IsNullOrWhiteSpace(MyRecords.Name))
             {
                 textBoxName.ReadOnly = true;
-                textBoxValue.ReadOnly = true;
-                textBoxTTL.ReadOnly = true;
                 comboBoxRecordType.Enabled = false;
-                buttonOK.Enabled = false;
-             }
+
+                textBoxName.Text = MyRecords.Name;
+                string s = "";
+                foreach (var v in MyRecords.ResourceRecords)
+                {
+                    if (!string.IsNullOrWhiteSpace(s)) { s += "\n"; }
+                    s += v.Value;
+                }
+                textBoxValue.Text = s;
+                textBoxTTL.Text = MyRecords.TTL.ToString();
+                comboBoxRecordType.Text = MyRecords.Type;
+                comboBoxRecordType_SelectedIndexChanged(null, null);
+
+                if (MyRecords.Type == "SOA" || MyRecords.Type == "NS")
+                {
+                    textBoxValue.ReadOnly = true;
+                    textBoxTTL.ReadOnly = true;
+                    buttonOK.Enabled = false;
+                    listBoxOptions.Enabled = false;
+                }
+            }
+            else
+            {
+                //These we do not support adding for, because we are not using them. Feel free to take some exceptions out.
+                comboBoxRecordType.Items.Remove("PTR");
+                comboBoxRecordType.Items.Remove("SRV");
+                comboBoxRecordType.Items.Remove("SPF");
+                comboBoxRecordType.Items.Remove("NS");
+                comboBoxRecordType.Items.Remove("SOA");
+
+                textBoxTTL.Text = "800";
+            }
         }
 
         const string gooleAppsEmailServersMsg = "Google Apps MX servers";
@@ -125,7 +141,6 @@ namespace ZAws.Console
                         }
                     }
                     break;
-                    break;
             }
         }
 
@@ -147,11 +162,51 @@ namespace ZAws.Console
             buttonInsertSelectedOption.Enabled = listBoxOptions.SelectedItems.Count > 0;
         }
 
+        void NewLineIfNeeded()
+        {
+            if (!string.IsNullOrWhiteSpace(textBoxValue.Text))
+            {
+                textBoxValue.Text += "\n";
+            }
+        }
         private void buttonInsertSelectedOption_Click(object sender, EventArgs e)
         {
             foreach (string i in listBoxOptions.SelectedItems)
             {
-                //TODO
+                NewLineIfNeeded();
+                if (i == gooleAppsEmailServersMsg)
+                {
+                    
+                    textBoxValue.Text += "1 ASPMX.L.GOOGLE.COM"
+                                 + "\n 5 ALT1.ASPMX.L.GOOGLE.COM"
+                                 + "\n 5 ALT2.ASPMX.L.GOOGLE.COM"
+                                 + "\n 10 ASPMX2.GOOGLEMAIL.COM"
+                                 + "\n 10 ASPMX3.GOOGLEMAIL.COM";
+                    continue;
+                }
+                if (comboBoxRecordType.Text == "MX")
+                {
+                    textBoxValue.Text += "10 ";
+                }
+                textBoxValue.Text += i;
+            }
+        }
+
+        private void buttonOK_Click(object sender, EventArgs e)
+        {
+            DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.Close();
+        }
+        internal IEnumerable<Amazon.Route53.Model.ResourceRecord> CurrentResourceRecords
+        {
+            get
+            {
+                List<Amazon.Route53.Model.ResourceRecord> list = new List<ResourceRecord>();
+                foreach (string s in textBoxValue.Text.Split('\n', '\r'))
+                {
+                    list.Add(new ResourceRecord().WithValue(s));
+                }
+                return list;
             }
         }
     }

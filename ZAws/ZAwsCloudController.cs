@@ -178,15 +178,6 @@ namespace ZAws
             {
                 //TEST ZONE
                 {
-                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                    ListHostedZonesResponse route53Zones2 = GetHostedZones();
-                    UpdateClassOfObjects(currentHostedZones, route53Zones2.ListHostedZonesResult.HostedZones);
-
-                    foreach (ZAwsHostedZone zone in CurrentHostedZones)
-                    {
-                        lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                        zone.UpdateInfo();
-                    }
                 }
                 //Now continues normally
 
@@ -351,31 +342,6 @@ namespace ZAws
             return resp;
         }
         #endregion
-
-        /*
-        public bool StartInstance(ZAwsEc2 zAwsEc2Instance)
-        {
-            StartInstancesResponse resp = ec2.StartInstances(new StartInstancesRequest()
-                    .WithInstanceId(zAwsEc2Instance.InstanceId));
-
-            return true;
-        }
-        public bool StopInstance(ZAwsEc2 zAwsEc2Instance)
-        {
-            StopInstancesResponse resp = ec2.StopInstances(new StopInstancesRequest()
-                    .WithInstanceId(zAwsEc2Instance.InstanceId));
-
-            return true;
-        }
-        
-        private void GetInfo()
-        {
-            //TODO: this is all just sample code to figure our the syntax! Do not use like this, it will not work.
-            Amazon.CloudWatch.AmazonCloudWatchClient w = new Amazon.CloudWatch.AmazonCloudWatchClient();
-
-            var resp = w.GetMetricStatistics(new Amazon.CloudWatch.Model.GetMetricStatisticsRequest());
-            double b = resp.GetMetricStatisticsResult.Datapoints[0].Average;
-        }*/
 
         internal string AllocateIp()
         {
