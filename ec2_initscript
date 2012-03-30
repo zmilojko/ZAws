@@ -1,0 +1,61 @@
+#!/bin/bash -e
+exec > >(tee /var/log/user-data.log|logger -s 2>/dev/console) 2>&1
+full_update()
+{
+	echo 'performing distribution update - this will only pick up Amazon update packages'
+    yum update -y > /var/log/on_launch_update
+}
+
+key_management()
+{
+	echo 'Writing KnwonHosts, id_rsa and id_rsa.pub files for root'
+	echo '{FILE=Ec2InitKnownHosts}' > /root/.ssh/known_hosts
+	echo '{FILE=Ec2InitDefaultSshPrivateKey}' > /root/.ssh/id_rsa
+	echo '{FILE=Ec2InitDefaultSshPublicKey}' > /root/.ssh/id_rsa.pub
+	chmod 622 /root/.ssh/known_hosts
+	chmod 600 /root/.ssh/id_rsa
+	chmod 622 /root/.ssh/id_rsa.pub
+	echo 'Writing KnwonHosts, id_rsa and id_rsa.pub files for ec2-user'
+	echo '{FILE=Ec2InitKnownHosts}' > /home/ec2-user/.ssh/known_hosts
+	echo '{FILE=Ec2InitDefaultSshPrivateKey}' > /home/ec2-user/.ssh/id_rsa
+	echo '{FILE=Ec2InitDefaultSshPublicKey}' > /home/ec2-user/.ssh/id_rsa.pub
+	chown ec2-user /home/ec2-user/.ssh/known_hosts
+	chown ec2-user /home/ec2-user/.ssh/id_rsa
+	chown ec2-user /home/ec2-user/.ssh/id_rsa.pub
+	chmod 622 /home/ec2-user/.ssh/known_hosts
+	chmod 600 /home/ec2-user/.ssh/id_rsa
+	chmod 622 /home/ec2-user/.ssh/id_rsa.pub
+}
+
+install_apps()
+{
+	#this function is automatically generated, do not alter even a bit.
+	echo 'Installing all defined applications, if any.'
+	#{INSTALL_APP_START}
+	#{INSTALL_APP_END}
+	
+	echo 'Done installing all defined applications, if any.'
+}
+
+echo 'Starting executing customer boot script!'
+
+# sets keys. keys are defined in the zawscc configuration (App.config)
+key_management
+
+
+# performs yum update, and anything else added to the full_update script
+full_update
+
+# performs yum update, and anything else added to the full_update script
+install_apps
+
+
+
+echo 'Finalizing configuration and starting web server'
+
+#some finalization
+#chkconfig httpd on
+service httpd restart
+
+
+echo 'Done executing customer boot script! Instance is now fully running!'

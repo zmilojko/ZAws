@@ -45,8 +45,25 @@ namespace ZAws.Console
                 string s = "";
                 foreach (var rr in r.ResourceRecords)
                 {
-                    if (!string.IsNullOrWhiteSpace(s)) { s += "\r"; }
-                    s += rr.Value;
+                    string newEntry = rr.Value;
+                    //try to find elastic IPs
+                    foreach (var el in MyController.CurrentElasticIps)
+                    {
+                        if (el.Name == rr.Value)
+                        {
+                            if (el.Associated)
+                            {
+                                newEntry += " => " + el.AssociatedEc2.Name;
+                            }
+                            else
+                            {
+                                newEntry += " => Elastic IP => X";
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(s)) { s += "\r\n"; }
+                    s += newEntry;
                 }
 
                 item.SubItems.Add(s);

@@ -171,9 +171,9 @@ namespace ZAws.Console
             Rectangle IconSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 3, 100, 25);
             Rectangle AdditionalIconSpace = new Rectangle(e.Bounds.X + 5, e.Bounds.Y + 25, 50, 10);
             Rectangle NameSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 30, 100, 30);
-            Rectangle DetailsSpace1 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 42, 100, 30);
-            Rectangle DetailsSpace2 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 54, 100, 30);
-            Rectangle DetailsSpace3 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 66, 100, 30);
+            Rectangle DetailsSpace1 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 42, 100, 15);
+            Rectangle DetailsSpace2 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 54, 100, 15);
+            Rectangle DetailsSpace3 = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 66, 100, 15);
             Rectangle DetailsSpace = new Rectangle(e.Bounds.X + 3, e.Bounds.Y + 42, e.Bounds.Width - 4, e.Bounds.Height - 44);
 
             e.Graphics.DrawString(obj.Name, NameFont, Brushes.DarkBlue, NameSpace);
@@ -279,6 +279,21 @@ namespace ZAws.Console
             {
                 e.Graphics.DrawString("EBS", IconFont, Brushes.Blue, IconSpace);
             }
+            else if (e.Item.Tag.GetType() == typeof(ZAwsSpotRequest))
+            {
+                ZAwsSpotRequest r = (ZAwsSpotRequest)e.Item.Tag;
+                Brush b = Brushes.Red;
+                if (r.ResponseData.State == "open")
+                {
+                    b = Brushes.Blue;
+                } 
+                if (r.ResponseData.State == "active")
+                {
+                    b = Brushes.Green;
+                }
+
+                e.Graphics.DrawString("SPOT", IconFont, b, IconSpace);
+            }
             else
             {
                 //Unknown ZAWS object
@@ -338,6 +353,7 @@ namespace ZAws.Console
                         && awsListView.SelectedItems[1].Tag.GetType() == typeof(ZAwsEc2))
                 {
                     buttonIpAssociateEnabled = true;
+                    buttonIpAssociate.Text = "Associate";
                 }
                 if (awsListView.SelectedItems[1].Tag.GetType() == typeof(ZAwsElasticIp)
                         && (!((ZAwsElasticIp)awsListView.SelectedItems[1].Tag).Associated)
@@ -451,12 +467,18 @@ namespace ZAws.Console
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
+            bool NoPrompt = false;
+            if (Control.ModifierKeys == Keys.Shift)
+            {
+                NoPrompt = true;
+            }
+
             foreach (ListViewItem item in awsListView.SelectedItems)
             {
-                var response = MessageBox.Show(string.Format("Are yo usure you want to permanently delete object {0} of type {1}?",
+                bool response = NoPrompt || MessageBox.Show(string.Format("Are yo usure you want to permanently delete object {0} of type {1}?",
                     ((ZAwsObject)item.Tag).Name, item.Tag.GetType()), "Confirm deletion - this cannot be undone!", MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
-                if (response == System.Windows.Forms.DialogResult.Yes)
+                    MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes;
+                if (response)
                 {
                     ((ZAwsObject)item.Tag).DeleteObject();
                     awsListView.SelectedItems.Clear();
@@ -540,9 +562,11 @@ namespace ZAws.Console
             }
             ZAwsObject obj = (ZAwsObject)awsListView.SelectedItems[0].Tag;
 
-            if (obj.GetType() == typeof(ZAwsEc2) && ((ZAwsEc2)obj).Status == ZAwsEc2.Ec2Status.Running)
+            if (obj.GetType() == typeof(ZAwsEc2))
             {
-                ((ZAwsEc2)obj).StartTerminal();
+                PopupEc2Output popup = new PopupEc2Output(controller, (ZAwsEc2)obj);
+                popup.Show();
+                //((ZAwsEc2)obj).StartTerminal();
                 return;
             }
             if (obj.GetType() == typeof(ZAwsHostedZone))

@@ -28,6 +28,8 @@ namespace ZAws.Console
             this.Close();
         }
 
+        const string newline = "\r\n";
+
         private void DlgEditDnsRecord_Load(object sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(MyRecords.Name))
@@ -39,7 +41,7 @@ namespace ZAws.Console
                 string s = "";
                 foreach (var v in MyRecords.ResourceRecords)
                 {
-                    if (!string.IsNullOrWhiteSpace(s)) { s += "\n"; }
+                    if (!string.IsNullOrWhiteSpace(s)) { s += newline; }
                     s += v.Value;
                 }
                 textBoxValue.Text = s;
@@ -81,7 +83,7 @@ namespace ZAws.Console
                     {
                         if (ip.Associated)
                         {
-                            InsertIntoTheSuggestionList(ip.AssociatedEc2.Name + (" via elastic Ip"));
+                            InsertIntoTheSuggestionList(ip.Name + "(" + ip.AssociatedEc2.Name + " via elastic Ip)");
                         }
                     }                    
                     foreach (var ip in MyController.CurrentElasticIps)
@@ -152,6 +154,7 @@ namespace ZAws.Console
                 {
                     return;
                 }
+
             }
             listBoxOptions.Items.Add(s);
         }
@@ -166,7 +169,7 @@ namespace ZAws.Console
         {
             if (!string.IsNullOrWhiteSpace(textBoxValue.Text))
             {
-                textBoxValue.Text += "\n";
+                textBoxValue.Text += newline;
             }
         }
         private void buttonInsertSelectedOption_Click(object sender, EventArgs e)
@@ -178,10 +181,10 @@ namespace ZAws.Console
                 {
                     
                     textBoxValue.Text += "1 ASPMX.L.GOOGLE.COM"
-                                 + "\n 5 ALT1.ASPMX.L.GOOGLE.COM"
-                                 + "\n 5 ALT2.ASPMX.L.GOOGLE.COM"
-                                 + "\n 10 ASPMX2.GOOGLEMAIL.COM"
-                                 + "\n 10 ASPMX3.GOOGLEMAIL.COM";
+                                 + newline + "5 ALT1.ASPMX.L.GOOGLE.COM"
+                                 + newline + "5 ALT2.ASPMX.L.GOOGLE.COM"
+                                 + newline + "10 ASPMX2.GOOGLEMAIL.COM"
+                                 + newline + "10 ASPMX3.GOOGLEMAIL.COM";
                     continue;
                 }
                 if (comboBoxRecordType.Text == "MX")
@@ -202,9 +205,15 @@ namespace ZAws.Console
             get
             {
                 List<Amazon.Route53.Model.ResourceRecord> list = new List<ResourceRecord>();
-                foreach (string s in textBoxValue.Text.Split('\n', '\r'))
+                foreach (string s in textBoxValue.Text.Split(new string[] {newline}, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    list.Add(new ResourceRecord().WithValue(s));
+                    string ss = s;
+                    if (s.Contains("via elastic"))
+                    {
+                        ss = s.Substring(0, s.IndexOf("("));
+                    }
+
+                    list.Add(new ResourceRecord().WithValue(ss));
                 }
                 return list;
             }

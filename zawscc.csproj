@@ -89,6 +89,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\PopupEc2Output.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\PopupEc2Output.Designer.cs">
+      <DependentUpon>PopupEc2Output.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\DlgEditDnsRecord.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -123,6 +129,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ZAws\ZAwsSpotRequest.cs" />
     <Compile Include="ZAws\ZAwsEbsVolume.cs" />
     <Compile Include="ZAws\ZAwsAmi.cs" />
     <Compile Include="ZAws\ZAwsSnapshot.cs" />
@@ -171,11 +178,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App\App.config" />
+    <None Include="app_addscript">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ec2_initscript">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PopupEc2Output.resx">
+      <DependentUpon>PopupEc2Output.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\DlgEditDnsRecord.resx">
       <DependentUpon>DlgEditDnsRecord.cs</DependentUpon>

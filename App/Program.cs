@@ -13,20 +13,35 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using System.Configuration;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace ZAws.Console
 {
     class Program
     {
+        static RegistryKey appKey = null;
+        public static RegistryKey AppRegKey
+        {
+            get
+            {
+                if (appKey != null)
+                {
+                    return appKey;
+                }
+                else
+                {
+                    appKey = Registry.CurrentUser.CreateSubKey(@"Software\ZWare\Zawscc");
+                    return appKey;
+                }
+            }
+        }
+
+        [STAThread]
         public static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ZAws.Console.MainView());
-            /*
-            Console.Write(GetServiceOutput());
-            Console.Read();
-             */
         }
 
         public static string GetServiceOutput()

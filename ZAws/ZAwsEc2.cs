@@ -18,6 +18,11 @@ namespace ZAws
             Update(res);
 
             StatisticsValid = false;
+
+            LatestBootConsoleTimestamp = "";
+            ConsoleOutput = "";
+
+            myController.HandleNewEc2Instance(this);
         }
 
         public override string Name
@@ -99,6 +104,11 @@ namespace ZAws
         internal void Stop()
         {
             StopInstancesResponse resp = myController.ec2.StopInstances(new StopInstancesRequest()
+                    .WithInstanceId(InstanceId));
+        }
+        internal void Reboot()
+        {
+            RebootInstancesResponse resp = myController.ec2.RebootInstances(new RebootInstancesRequest()
                     .WithInstanceId(InstanceId));
         }
 
@@ -234,6 +244,46 @@ namespace ZAws
             {
                 this.TriggerStatusChanged();
             }
+
+            //check terminal
+
+            Amazon.EC2.Model.GetConsoleOutputResponse resp =
+                myController.ec2.GetConsoleOutput(new Amazon.EC2.Model.GetConsoleOutputRequest()
+                                        .WithInstanceId(this.InstanceId));
+
+            if (LatestBootConsoleTimestamp != resp.GetConsoleOutputResult.ConsoleOutput.Timestamp)
+            {
+                LatestBootConsoleTimestamp = resp.GetConsoleOutputResult.ConsoleOutput.Timestamp;
+
+
+                ConsoleOutput = Encoding.UTF8.GetString(Convert.FromBase64String(resp.GetConsoleOutputResult.ConsoleOutput.Output));
+ 
+                if(ConsoleUpdate != null)
+                {
+                    ConsoleUpdate(this, new NewConceolOutputEventArgs(ConsoleOutput, LatestBootConsoleTimestamp));
+                }
+            }
+        }
+
+        public class NewConceolOutputEventArgs : EventArgs
+        {
+            public NewConceolOutputEventArgs(string output, string timestamp)
+            { Output = output; Timestamp = timestamp; }
+
+            public readonly string Timestamp;
+            public readonly string Output;
+        }
+
+        public event EventHandler<NewConceolOutputEventArgs> ConsoleUpdate;
+
+        public string LatestBootConsoleTimestamp { get; private set; }
+        public string ConsoleOutput { get; private set; }
+
+        internal void SetName(string p)
+        {
+             Amazon.EC2.Model.CreateTagsResponse response2 = myController.ec2.CreateTags(new Amazon.EC2.Model.CreateTagsRequest()
+                                                .WithResourceId(this.InstanceId)
+                                                .WithTag(new Amazon.EC2.Model.Tag().WithKey("Name").WithValue(Name)));
         }
     }
 }

@@ -58,6 +58,7 @@ namespace ZAws
         List<ZAwsSnapshot> currentSnapshots = new List<ZAwsSnapshot>();
         List<ZAwsAmi> currentAmis = new List<ZAwsAmi>();
         List<ZAwsEbsVolume> currentEbsVolumes = new List<ZAwsEbsVolume>();
+        List<ZAwsSpotRequest> currentSpotRequests = new List<ZAwsSpotRequest>();
 
         public ZAwsEc2[] CurrentEc2s { get { return currentStatusEc2.ToArray(); } }
         public ZAwsElasticIp[] CurrentElasticIps { get { return currentStatusElIps.ToArray(); } }
@@ -68,6 +69,7 @@ namespace ZAws
         public ZAwsSnapshot[] CurrentSnapshots { get { return currentSnapshots.ToArray(); } }
         public ZAwsAmi[] CurrentAmis { get { return currentAmis.ToArray(); } }
         public ZAwsEbsVolume[] CurrentEbsVolumes { get { return currentEbsVolumes.ToArray(); } }
+        public ZAwsSpotRequest[] CurrentSpotRequests { get { return currentSpotRequests.ToArray(); } }
 
 
         public ZAwsEc2 GetEc2(string InstanceId)
@@ -217,6 +219,10 @@ namespace ZAws
                 lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                 DescribeVolumesResponse respEbsVolumes = GetEbsVolumes();
                 UpdateClassOfObjects(currentEbsVolumes, respEbsVolumes.DescribeVolumesResult.Volume);
+                
+                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                DescribeSpotInstanceRequestsResponse respSpotRequests = GetSpotRequests();
+                UpdateClassOfObjects(currentSpotRequests, respSpotRequests.DescribeSpotInstanceRequestsResult.SpotInstanceRequest);
 
 
                 foreach (ZAwsEc2 ec2Instance in CurrentEc2s)
@@ -341,6 +347,13 @@ namespace ZAws
             DescribeImagesResponse resp = ec2.DescribeImages(request);
             return resp;
         }
+        private DescribeSpotInstanceRequestsResponse GetSpotRequests()
+        {
+            DescribeSpotInstanceRequestsRequest request = new DescribeSpotInstanceRequestsRequest();
+            DescribeSpotInstanceRequestsResponse resp = ec2.DescribeSpotInstanceRequests(request);
+            return resp;
+        }
+        
         #endregion
 
         internal string AllocateIp()
@@ -355,6 +368,151 @@ namespace ZAws
                                                                             .WithName(p)
                                                                             .WithCallerReference("zawscc" + new Random().Next(1000).ToString())
                                                                             );
+        }
+
+        List<ZAwsAmi.NewApp> runningApps = new List<ZAwsAmi.NewApp>();
+
+        internal void RegisterNewApps(ZAwsAmi.NewApp[] NewInstalledApps)
+        {
+            runningApps.AddRange(NewInstalledApps);
+        }
+
+        internal void HandleNewEc2Instance(ZAwsEc2 newEc2)
+        {
+            //Check if you should set a name to yourself
+            foreach (var n in NamesForSpotInstance)
+            {
+                if (n.NewInstanceId == newEc2.InstanceId)
+                {
+                    newEc2.SetName(n.NewInstanceName);
+                }
+            }
+
+            //Now check if additional action is needed with this EC2
+            foreach (var app in runningApps)
+            {
+                if (app.DeployedOnInstanceId == newEc2.InstanceId)
+                {
+                    app.DeployedOnInstance = newEc2;
+                    ConfigureAppIfNeeded(app);
+                }
+            }
+        }
+
+        internal void HandleNewElasticIp(ZAwsElasticIp zAwsElasticIp)
+        {
+            foreach (var app in runningApps)
+            {
+                if ((!zAwsElasticIp.Associated) && (app.AssignedIpValue == zAwsElasticIp.Name) && (app.DeployedOnInstance != null))
+                {
+                    zAwsElasticIp.Associate(app.DeployedOnInstance);
+                }
+            }
+        }
+
+        private void ConfigureAppIfNeeded(ZAwsAmi.NewApp app)
+        {
+            if (!app.CreateUrlRecords)
+            {
+                return;
+            }
+
+            //IP assignment
+            if (app.DeployedOnInstance != null && string.IsNullOrWhiteSpace(app.AssignedIpValue))
+            {
+                //First check if some IP has already been associated with another app running on the same instance - this is the case
+                // when more then one app is downloaded to that instance
+                foreach (var app2 in runningApps)
+                {
+                    if (app2.DeployedOnInstanceId == app.DeployedOnInstanceId && !string.IsNullOrWhiteSpace(app2.AssignedIpValue))
+                    {
+                        app.AssignedIpValue = app2.AssignedIpValue;
+                        //Call the same function to assign the URL records
+                        ConfigureAppIfNeeded(app);
+                        return;
+                    }
+                }
+
+                //Try to find one unassigned IP, and assign it
+                foreach (var ip in CurrentElasticIps)
+                {
+                    if (!ip.Associated)
+                    {
+                        ip.Associate(app.DeployedOnInstance);
+                        app.AssignedIpValue = ip.Name;
+                        //Call the same function to assign the URL records
+                        ConfigureAppIfNeeded(app);
+                        return;
+                    }
+                }
+                //There was no unassigned IPs, create a new one
+                app.AssignedIpValue = AllocateIp();
+            }
+
+            if (!string.IsNullOrWhiteSpace(app.AssignedIpValue) && app.AssignedToHostedZone == null)
+            {
+                //Now try to find the hosted zone
+                foreach (var zone in currentHostedZones)
+                {
+                    //Name of the hosted zone must match the ending of the app URL. 
+                    if (app.AppUrl.TrimEnd('.').IndexOf(zone.Name.TrimEnd('.')) == app.AppUrl.TrimEnd('.').Length - zone.Name.TrimEnd('.').Length)
+                    {
+                        //Now add the record
+                        zone.AddRecord(new Amazon.Route53.Model.ResourceRecordSet()
+                                                            .WithName(app.AppUrl)
+                                                            .WithType("A")
+                                                            .WithTTL(800)
+                                                            .WithResourceRecords(new ResourceRecord()
+                                                                                        .WithValue(app.AssignedIpValue)));
+
+                    }
+                }
+            }
+        }
+
+        class NameForSpotInstance
+        {
+            public string SpotInstanceRequestId;
+            public string NewInstanceName;
+            public string NewInstanceId = "";
+        }
+        List<NameForSpotInstance> NamesForSpotInstance = new List<NameForSpotInstance>();
+
+        internal void RememberNameForSpotInstance(string spotInstanceRequestId, string newInstanceName)
+        {
+            NamesForSpotInstance.Add(new NameForSpotInstance()
+                                        {
+                                            NewInstanceName = newInstanceName,
+                                            SpotInstanceRequestId = spotInstanceRequestId
+                                        });
+        }
+
+        internal void AssignInstanceToSpotRequest(string SpotInstanceRequestId,string InstanceId)
+        {
+            foreach (var n in NamesForSpotInstance)
+            {
+                if (n.SpotInstanceRequestId == SpotInstanceRequestId)
+                {
+                    n.NewInstanceId = InstanceId;
+                }
+            }
+
+            foreach (var app in this.runningApps)
+            {
+                if (app.DeployedOnInstanceId == SpotInstanceRequestId)
+                {
+                    app.DeployedOnInstanceId = InstanceId;
+                    
+                }
+            }
+            //now check if that instance is already there, and register it
+            foreach (var i in CurrentEc2s)
+            {
+                if (i.InstanceId == InstanceId)
+                {
+                    HandleNewEc2Instance(i);
+                }
+            }
         }
     }
 }

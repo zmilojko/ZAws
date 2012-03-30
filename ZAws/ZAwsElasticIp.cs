@@ -13,6 +13,8 @@ namespace ZAws
             : base(controller)
         {
             Update(res);
+
+            myController.HandleNewElasticIp(this);
         }
         Amazon.EC2.Model.Address ResponseData;
 

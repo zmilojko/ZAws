@@ -59,5 +59,38 @@ namespace ZAws.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to mkdir /var/rails_apps/{0}
+        ///cd /var/rails_apps/{0}
+        ///git init
+        ///git remote add origin {1}
+        ///git pull origin master
+        ///
+        ///bundle install
+        ///
+        ///service mysqld start
+        ///rake db:create RAILS_ENV=&quot;production&quot;
+        ///rake db:migrate RAILS_ENV=&quot;production&quot;
+        ///rake assets:precompile
+        ///
+        ///
+        ///chmod 777 /var/rails_apps/{0} -R
+        ///
+        ///echo &quot;&lt;VirtualHost *:80&gt;
+        ///    ServerName {2}
+        ///    DocumentRoot /var/rails_apps/{0}{3}
+        ///    &lt;Directory /var/rails_apps/{0}{3}&gt;
+        ///       AllowOverride all
+        ///       Options -MultiViews
+        ///    &lt;/Directory&gt;
+        ///&lt;/VirtualHost&gt;
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddAppScript {
+            get {
+                return ResourceManager.GetString("AddAppScript", resourceCulture);
+            }
+        }
     }
 }

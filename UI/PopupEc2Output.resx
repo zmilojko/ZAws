@@ -117,18 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="label11.Text" xml:space="preserve">
-    <value>App. location is a git repository location that can be accessed using SSH with client key authentication, for 
-instance "git@github.com:zmilojko/example.git". Destination is a directory that will be created under
-/var/&lt;app type&gt;/ directory, in which the application will be placed (leave empty for default, which will be
-appX, where X is a unique number). Application URL is a domain URL that will open such application, for 
-instance  myapp.zwr.fi. If check box 'Check/create ...' is checked, the Wizard will try to create all records for 
-app to be available through the URL immediatelly. If 'Default application...' check box is checked, this will 
-be a default application, shown by the server when IP is typed into the browser URl field.
-
-This wizard can handle Rails applications and generic applications (where root folder of application is a root folder 
-of the Apache Virtual Host).</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
