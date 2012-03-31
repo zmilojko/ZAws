@@ -14,6 +14,8 @@ using Amazon.S3.Model;
 using System.Configuration;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Diagnostics;
+using System.Threading;
 
 namespace ZAws.Console
 {
@@ -42,6 +44,11 @@ namespace ZAws.Console
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ZAws.Console.MainView());
+        }
+
+        static void c_ReceivedString(object sender, ZawsSshClient.ReceivedStringEventArgs e)
+        {
+            Trace.WriteLine(e.ReceivedString);
         }
 
         public static string GetServiceOutput()

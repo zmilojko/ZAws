@@ -7,9 +7,7 @@
 	git remote add origin {1}
 	git pull origin master
 
-	echo "  preparing application (bundle, rake tasks)"
 	chmod 777 /var/rails_apps/{0} -R
-	#sh /var/rails_apps/{0}/STARTME > /dev/null 2>&1 || true
 
 	echo "  creating virtual host"
 	echo "<VirtualHost *:80>

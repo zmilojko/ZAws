@@ -144,6 +144,8 @@ namespace ZAws
 
                 NewInstanceId = response.RunInstancesResult.Reservation.RunningInstance[0].InstanceId;
 
+                System.Threading.Thread.Sleep(5000);
+
                 Amazon.EC2.Model.CreateTagsResponse response2 = myController.ec2.CreateTags(new Amazon.EC2.Model.CreateTagsRequest()
                                                     .WithResourceId(NewInstanceId)
                                                     .WithTag(new Amazon.EC2.Model.Tag().WithKey("Name").WithValue(Name)));

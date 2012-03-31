@@ -1,5 +1,5 @@
 #!/bin/bash -e
-exec > >(tee /var/log/user-data.log|logger -s 2>/dev/console) 2>&1
+
 full_update()
 {
 	echo 'performing distribution update - this will only pick up Amazon update packages'
@@ -39,6 +39,12 @@ install_apps()
 
 echo 'Starting executing customer boot script!'
 
+#echo 'Asking who I am'
+#whoami
+
+#echo 'Check installed rubies'
+#rvm list
+
 # sets keys. keys are defined in the zawscc configuration (App.config)
 key_management
 
@@ -54,8 +60,7 @@ install_apps
 echo 'Finalizing configuration and starting web server'
 
 #some finalization
-#chkconfig httpd on
-service httpd restart
-
+chkconfig httpd on
+chkconfig httpd on
 
 echo 'Done executing customer boot script! Instance is now fully running!'

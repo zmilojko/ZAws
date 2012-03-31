@@ -22,8 +22,10 @@ namespace ZAws
             LatestBootConsoleTimestamp = "";
             ConsoleOutput = "";
 
-            myController.HandleNewEc2Instance(this);
+            ConfigureAppsWhenBootingComplete = myController.HandleNewEc2Instance(this);
         }
+
+        bool ConfigureAppsWhenBootingComplete;
 
         public override string Name
         {
@@ -121,13 +123,22 @@ namespace ZAws
             }
         }
 
+        internal string PrivateKeyFile
+        {
+            get
+            {
+                string awsKeyPath = System.Configuration.ConfigurationManager.AppSettings["SSHPrivateKeysDir"];
+                return awsKeyPath + this.Reservation.RunningInstance[0].KeyName;
+            }
+        }
+
         internal void StartTerminal()
         {
-            string awsKeyPath = System.Configuration.ConfigurationManager.AppSettings["SSHPrivateKeysDir"];
+            
             string awsTerminalApp = System.Configuration.ConfigurationManager.AppSettings["SSHTerminalApp"];
             string awsTerminalCommandLines = string.Format(System.Configuration.ConfigurationManager.AppSettings["SSHTerminaAppArgs"],
                 this.Reservation.RunningInstance[0].PublicDnsName,
-                awsKeyPath + this.Reservation.RunningInstance[0].KeyName + ".ppk");
+                PrivateKeyFile + ".ppk");
 
             Process p = Process.Start(awsTerminalApp, awsTerminalCommandLines);
         }
@@ -257,12 +268,37 @@ namespace ZAws
 
 
                 ConsoleOutput = Encoding.UTF8.GetString(Convert.FromBase64String(resp.GetConsoleOutputResult.ConsoleOutput.Output));
- 
+
                 if(ConsoleUpdate != null)
                 {
                     ConsoleUpdate(this, new NewConceolOutputEventArgs(ConsoleOutput, LatestBootConsoleTimestamp));
                 }
             }
+            if (this.ConfigureAppsWhenBootingComplete)
+            {
+                ConfigureAppsOnBootComplete();
+            }
+        }
+
+        private void ConfigureAppsOnBootComplete()
+        {
+            if (string.IsNullOrWhiteSpace(this.Reservation.RunningInstance[0].PublicDnsName)
+                || string.IsNullOrWhiteSpace(this.ConsoleOutput))
+            {
+                return;
+            }
+
+            //We will hardcode this for a while
+            this.SshClient.SendLine("sudo su", true);
+            foreach (var app in this.myController.runningApps)
+            {
+                if (app.DeployedOnInstanceId == this.InstanceId)
+                {
+                    this.SshClient.SendLine(string.Format("bash /var/rails_apps/{0}/STARTME > /var/log/app_init_{0}", app.AppName), true);
+                }
+            }
+            this.SshClient.SendLine("reboot");
+            ConfigureAppsWhenBootingComplete = false;
         }
 
         public class NewConceolOutputEventArgs : EventArgs
@@ -279,11 +315,32 @@ namespace ZAws
         public string LatestBootConsoleTimestamp { get; private set; }
         public string ConsoleOutput { get; private set; }
 
-        internal void SetName(string p)
+        public void SetName(string p)
         {
              Amazon.EC2.Model.CreateTagsResponse response2 = myController.ec2.CreateTags(new Amazon.EC2.Model.CreateTagsRequest()
                                                 .WithResourceId(this.InstanceId)
                                                 .WithTag(new Amazon.EC2.Model.Tag().WithKey("Name").WithValue(Name)));
+        }
+
+        ZawsSshClient sshClient = null;
+        void CloseSshClient()
+        {
+            if (sshClient != null)
+            {
+                sshClient.Close();
+                sshClient = null;
+            }
+        }
+        public ZawsSshClient SshClient
+        {
+            get
+            {
+                if (sshClient == null)
+                {
+                    sshClient = new ZawsSshClient(this.Reservation.RunningInstance[0].PublicDnsName, "ec2-user", "", PrivateKeyFile + ".ssh2");
+                }
+                return sshClient;
+            }
         }
     }
 }

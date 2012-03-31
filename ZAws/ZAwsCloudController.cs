@@ -370,15 +370,16 @@ namespace ZAws
                                                                             );
         }
 
-        List<ZAwsAmi.NewApp> runningApps = new List<ZAwsAmi.NewApp>();
+        internal List<ZAwsAmi.NewApp> runningApps = new List<ZAwsAmi.NewApp>();
 
         internal void RegisterNewApps(ZAwsAmi.NewApp[] NewInstalledApps)
         {
             runningApps.AddRange(NewInstalledApps);
         }
 
-        internal void HandleNewEc2Instance(ZAwsEc2 newEc2)
+        internal bool HandleNewEc2Instance(ZAwsEc2 newEc2)
         {
+            bool appNeedsAttention = false;
             //Check if you should set a name to yourself
             foreach (var n in NamesForSpotInstance)
             {
@@ -393,10 +394,13 @@ namespace ZAws
             {
                 if (app.DeployedOnInstanceId == newEc2.InstanceId)
                 {
+                    appNeedsAttention = true;
                     app.DeployedOnInstance = newEc2;
                     ConfigureAppIfNeeded(app);
                 }
             }
+
+            return appNeedsAttention;
         }
 
         internal void HandleNewElasticIp(ZAwsElasticIp zAwsElasticIp)

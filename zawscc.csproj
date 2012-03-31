@@ -78,6 +78,10 @@
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Routrek.granados, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Routrek.granados.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
@@ -129,6 +133,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ZawsSshClient.cs" />
     <Compile Include="ZAws\ZAwsSpotRequest.cs" />
     <Compile Include="ZAws\ZAwsEbsVolume.cs" />
     <Compile Include="ZAws\ZAwsAmi.cs" />
@@ -212,5 +217,4 @@
   <ItemGroup>
     <Content Include="App\Z-ware_logo.ico" />
   </ItemGroup>
-  <ItemGroup />
 </Project>
