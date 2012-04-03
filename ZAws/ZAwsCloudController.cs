@@ -1,4 +1,20 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////////////
+//   Copyright 2012 Z-Ware Ltd.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +28,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.CloudWatch;
 using Amazon.CloudWatch.Model;
+using ZAws.Console;
 
 
 namespace ZAws
@@ -176,121 +193,145 @@ namespace ZAws
         #region Monitor query functions
         void MonitorFunction()
         {
+            Program.TraceLine("Monitoring thread started...");
             while (true)
             {
-                //TEST ZONE
+                try
                 {
-                }
-                //Now continues normally
+                    //TEST ZONE
+                    {
+                    }
+                    //Now continues normally
 
 
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeInstancesResponse respEc2 = GetRunningInstances();
-                UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeAddressesResponse respElasitIp = GetElasticIps();
-                UpdateClassOfObjects(currentStatusElIps, respElasitIp.DescribeAddressesResult.Address);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                ListHostedZonesResponse route53Zones = GetHostedZones();
-                UpdateClassOfObjects(currentHostedZones, route53Zones.ListHostedZonesResult.HostedZones);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                ListBucketsResponse s3Buckects = GetBuckets();
-                UpdateClassOfObjects(currentS3Buckets, s3Buckects.Buckets);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeSnapshotsResponse respEc2Snapshots = GetSnapshots();
-                UpdateClassOfObjects(currentSnapshots, respEc2Snapshots.DescribeSnapshotsResult.Snapshot);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeKeyPairsResponse respKeyPairs = GetKeyPairs();
-                UpdateClassOfObjects(currentKeyPairs, respKeyPairs.DescribeKeyPairsResult.KeyPair);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeSecurityGroupsResponse respSecGroups = GetSecurityGroups();
-                UpdateClassOfObjects(currentSecGroups, respSecGroups.DescribeSecurityGroupsResult.SecurityGroup);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeImagesResponse respAmis = GetAmis();
-                UpdateClassOfObjects(currentAmis, respAmis.DescribeImagesResult.Image);
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeVolumesResponse respEbsVolumes = GetEbsVolumes();
-                UpdateClassOfObjects(currentEbsVolumes, respEbsVolumes.DescribeVolumesResult.Volume);
-                
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                DescribeSpotInstanceRequestsResponse respSpotRequests = GetSpotRequests();
-                UpdateClassOfObjects(currentSpotRequests, respSpotRequests.DescribeSpotInstanceRequestsResult.SpotInstanceRequest);
-
-
-                foreach (ZAwsEc2 ec2Instance in CurrentEc2s)
-                {
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                    ec2Instance.UpdateInfo();
-                }
+                    DescribeInstancesResponse respEc2 = GetRunningInstances();
+                    UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
 
-                foreach (ZAwsHostedZone zone in CurrentHostedZones)
-                {
+                    foreach (ZAwsEc2 ec2Instance in CurrentEc2s)
+                    {
+                        lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                        ec2Instance.UpdateInfo();
+                    }
+
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-                    zone.UpdateInfo();
+                    DescribeAddressesResponse respElasitIp = GetElasticIps();
+                    UpdateClassOfObjects(currentStatusElIps, respElasitIp.DescribeAddressesResult.Address);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    ListHostedZonesResponse route53Zones = GetHostedZones();
+                    UpdateClassOfObjects(currentHostedZones, route53Zones.ListHostedZonesResult.HostedZones);
+
+                    foreach (ZAwsHostedZone zone in CurrentHostedZones)
+                    {
+                        lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                        zone.UpdateInfo();
+                    }
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    ListBucketsResponse s3Buckects = GetBuckets();
+                    UpdateClassOfObjects(currentS3Buckets, s3Buckects.Buckets);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    DescribeSnapshotsResponse respEc2Snapshots = GetSnapshots();
+                    UpdateClassOfObjects(currentSnapshots, respEc2Snapshots.DescribeSnapshotsResult.Snapshot);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    DescribeKeyPairsResponse respKeyPairs = GetKeyPairs();
+                    UpdateClassOfObjects(currentKeyPairs, respKeyPairs.DescribeKeyPairsResult.KeyPair);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    DescribeSecurityGroupsResponse respSecGroups = GetSecurityGroups();
+                    UpdateClassOfObjects(currentSecGroups, respSecGroups.DescribeSecurityGroupsResult.SecurityGroup);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    DescribeImagesResponse respAmis = GetAmis();
+                    UpdateClassOfObjects(currentAmis, respAmis.DescribeImagesResult.Image);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    DescribeVolumesResponse respEbsVolumes = GetEbsVolumes();
+                    UpdateClassOfObjects(currentEbsVolumes, respEbsVolumes.DescribeVolumesResult.Volume);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                    DescribeSpotInstanceRequestsResponse respSpotRequests = GetSpotRequests();
+                    UpdateClassOfObjects(currentSpotRequests, respSpotRequests.DescribeSpotInstanceRequestsResult.SpotInstanceRequest);
+
+                    lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+
+                    if (ThreadInRecovery)
+                    {
+                        Program.TraceLine("Monitoring working fine again...");
+                        ThreadInRecovery = false;
+                    }
                 }
-
-                lock (Ec2Lock) { if (!RunMonitoring) { return; } }
-
-                //Give ther threads a chance, and also allow user to smoothly disconnect
-                Thread.Sleep(200);
+                catch (Exception ex)
+                {
+                    Program.TraceLine("Monitoring thread encountered an error. Will restart in {0}...", ex, ThreadInRecovery ? "1 minute" : "5 seconds");
+                    for (int i = 0; i < (ThreadInRecovery ? 600: 50); i++)
+                    {
+                        lock (Ec2Lock) { if (!RunMonitoring) { return; } }
+                        Thread.Sleep(100);
+                    }
+                    Program.TraceLine("Monitoring thread trying to recover...");
+                    ThreadInRecovery = true;
+                }
             }
         }
+        bool ThreadInRecovery = false;
+
         void UpdateClassOfObjects<T, U>(List<T> ListToUpdate, List<U> ListOfResponses) where T : ZAwsObject
         {
-            //UpdateClassOfObjects(currentStatus, resp.DescribeInstancesResult.Reservation);
-            foreach (U res in ListOfResponses)
+            lock (MonitoringThreadLock)
             {
-                bool found = false;
-                foreach (T oldI in ListToUpdate)
-                {
-                    if (oldI.EqualsData(res))
-                    {
-                        oldI.Update(res);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    T NewObj = (T)Activator.CreateInstance(typeof(T), this, res);
-                    ListToUpdate.Add(NewObj);
-                    if (NewObject != null)
-                    {
-                        NewObject(this, new ZAwsNewObjectEventArgs(NewObj));
-                    }
-                }
-            }
-
-            //Now do check for terminated ones!
-            List<T> toDeleteList = new List<T>();
-            foreach (T oldI in ListToUpdate)
-            {
-                bool found = false;
+                //UpdateClassOfObjects(currentStatus, resp.DescribeInstancesResult.Reservation);
                 foreach (U res in ListOfResponses)
                 {
-                    if (oldI.EqualsData(res))
+                    bool found = false;
+                    foreach (T oldI in ListToUpdate)
                     {
-                        found = true;
-                        break;
+                        if (oldI.EqualsData(res))
+                        {
+                            oldI.Update(res);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        T NewObj = (T)Activator.CreateInstance(typeof(T), this, res);
+                        Program.TraceLine("New ZAws object, type: {0}, name {1}", NewObj.GetType().Name, NewObj.Name);
+                        ListToUpdate.Add(NewObj);
+                        if (NewObject != null)
+                        {
+                            NewObject(this, new ZAwsNewObjectEventArgs(NewObj));
+                        }
                     }
                 }
-                if (!found)
+
+                //Now do check for terminated ones!
+                List<T> toDeleteList = new List<T>();
+                foreach (T oldI in ListToUpdate)
                 {
-                    toDeleteList.Add(oldI);
+                    bool found = false;
+                    foreach (U res in ListOfResponses)
+                    {
+                        if (oldI.EqualsData(res))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        toDeleteList.Add(oldI);
+                    }
                 }
-            }
-            foreach (T oldToDelete in toDeleteList)
-            {
-                ListToUpdate.Remove(oldToDelete);
-                oldToDelete.Delete();
+                foreach (T oldToDelete in toDeleteList)
+                {
+                    Program.TraceLine("Object removed, type: {0}, name {1}", oldToDelete.GetType().Name, oldToDelete.Name);
+                    ListToUpdate.Remove(oldToDelete);
+                    oldToDelete.Delete();
+                }
             }
         }
         private DescribeInstancesResponse GetRunningInstances()
@@ -371,6 +412,7 @@ namespace ZAws
         }
 
         internal List<ZAwsAmi.NewApp> runningApps = new List<ZAwsAmi.NewApp>();
+        internal object MonitoringThreadLock = new object();
 
         internal void RegisterNewApps(ZAwsAmi.NewApp[] NewInstalledApps)
         {
@@ -379,12 +421,14 @@ namespace ZAws
 
         internal bool HandleNewEc2Instance(ZAwsEc2 newEc2)
         {
+            Program.TraceLine("Check for post boot actions for EC2 {0}.", newEc2.Name);
             bool appNeedsAttention = false;
             //Check if you should set a name to yourself
             foreach (var n in NamesForSpotInstance)
             {
                 if (n.NewInstanceId == newEc2.InstanceId)
                 {
+                    Program.TraceLine(">>>Setting the new name to {0}.", n.NewInstanceName);
                     newEc2.SetName(n.NewInstanceName);
                 }
             }
@@ -394,12 +438,13 @@ namespace ZAws
             {
                 if (app.DeployedOnInstanceId == newEc2.InstanceId)
                 {
+                    Program.TraceLine(">>>Found an application that needs attention: {0}.", app.AppLocation);
                     appNeedsAttention = true;
                     app.DeployedOnInstance = newEc2;
                     ConfigureAppIfNeeded(app);
                 }
             }
-
+            Trace.WriteLine(">>>Done configuring apps, appNeedsAttention = " + appNeedsAttention);
             return appNeedsAttention;
         }
 
@@ -409,6 +454,8 @@ namespace ZAws
             {
                 if ((!zAwsElasticIp.Associated) && (app.AssignedIpValue == zAwsElasticIp.Name) && (app.DeployedOnInstance != null))
                 {
+                    Program.TraceLine(">>>Associating {0} to EC2 {1}, because of application {2}.", zAwsElasticIp.Name, app.DeployedOnInstance.Name,
+                        app.AppName);
                     zAwsElasticIp.Associate(app.DeployedOnInstance);
                 }
             }
@@ -416,6 +463,7 @@ namespace ZAws
 
         private void ConfigureAppIfNeeded(ZAwsAmi.NewApp app)
         {
+            Trace.WriteLine(">>>Configuring application " + app.AppName + " on " + app.DeployedOnInstanceId);
             if (!app.CreateUrlRecords)
             {
                 return;
@@ -430,6 +478,7 @@ namespace ZAws
                 {
                     if (app2.DeployedOnInstanceId == app.DeployedOnInstanceId && !string.IsNullOrWhiteSpace(app2.AssignedIpValue))
                     {
+                        Program.TraceLine(">>>IP already assigned to this EC2.");
                         app.AssignedIpValue = app2.AssignedIpValue;
                         //Call the same function to assign the URL records
                         ConfigureAppIfNeeded(app);
@@ -442,6 +491,7 @@ namespace ZAws
                 {
                     if (!ip.Associated)
                     {
+                        Program.TraceLine(">>>Found an unassigned Elastic IP, and will assigne it to the application: {0}.", ip.Name);
                         ip.Associate(app.DeployedOnInstance);
                         app.AssignedIpValue = ip.Name;
                         //Call the same function to assign the URL records
@@ -450,17 +500,20 @@ namespace ZAws
                     }
                 }
                 //There was no unassigned IPs, create a new one
+                Program.TraceLine(">>>Not found any free Elastic IPs, creating a new one.");
                 app.AssignedIpValue = AllocateIp();
             }
 
             if (!string.IsNullOrWhiteSpace(app.AssignedIpValue) && app.AssignedToHostedZone == null)
             {
                 //Now try to find the hosted zone
+                Program.TraceLine(">>>Searchign for a hosted zone to set following URL: {0}", app.AppUrl);
                 foreach (var zone in currentHostedZones)
                 {
                     //Name of the hosted zone must match the ending of the app URL. 
                     if (app.AppUrl.TrimEnd('.').IndexOf(zone.Name.TrimEnd('.')) == app.AppUrl.TrimEnd('.').Length - zone.Name.TrimEnd('.').Length)
                     {
+                        Program.TraceLine(">>>Adding following record: {0} to hosted zone {1}", app.AppUrl, zone.Name);
                         //Now add the record
                         zone.AddRecord(new Amazon.Route53.Model.ResourceRecordSet()
                                                             .WithName(app.AppUrl)
@@ -468,7 +521,6 @@ namespace ZAws
                                                             .WithTTL(800)
                                                             .WithResourceRecords(new ResourceRecord()
                                                                                         .WithValue(app.AssignedIpValue)));
-
                     }
                 }
             }

@@ -201,6 +201,7 @@
             this.buttonCancel.TabIndex = 14;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
             // label6
             // 
@@ -239,7 +240,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(550, 431);
+            this.tabPage3.Size = new System.Drawing.Size(544, 431);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Startup with app from a git repo";
             this.tabPage3.UseVisualStyleBackColor = true;

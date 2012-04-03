@@ -39,6 +39,7 @@
             this.buttonDelete = new System.Windows.Forms.Button();
             this.buttonEdit = new System.Windows.Forms.Button();
             this.buttonAdd = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listViewRecrods
@@ -85,16 +86,18 @@
             // 
             // buttonClose
             // 
+            this.buttonClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonClose.Location = new System.Drawing.Point(549, 209);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(75, 23);
             this.buttonClose.TabIndex = 1;
             this.buttonClose.Text = "Close";
             this.buttonClose.UseVisualStyleBackColor = true;
-            this.buttonClose.Click += new System.EventHandler(this.button1_Click);
+            this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
             // buttonDelete
             // 
+            this.buttonDelete.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonDelete.Enabled = false;
             this.buttonDelete.Location = new System.Drawing.Point(468, 209);
             this.buttonDelete.Name = "buttonDelete";
@@ -106,6 +109,7 @@
             // 
             // buttonEdit
             // 
+            this.buttonEdit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonEdit.Enabled = false;
             this.buttonEdit.Location = new System.Drawing.Point(387, 209);
             this.buttonEdit.Name = "buttonEdit";
@@ -117,6 +121,7 @@
             // 
             // buttonAdd
             // 
+            this.buttonAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonAdd.Location = new System.Drawing.Point(306, 209);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(75, 23);
@@ -125,12 +130,25 @@
             this.buttonAdd.UseVisualStyleBackColor = true;
             this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
             // 
+            // button1
+            // 
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(177, 209);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(123, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Show in Web Browser";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // DlgViewDnsRecords
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
+            this.CancelButton = this.buttonClose;
             this.ClientSize = new System.Drawing.Size(636, 244);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonDelete);
@@ -157,5 +175,6 @@
         private System.Windows.Forms.Button buttonDelete;
         private System.Windows.Forms.Button buttonEdit;
         private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.Button button1;
     }
 }

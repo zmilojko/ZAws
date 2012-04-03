@@ -1,10 +1,28 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////////////
+//   Copyright 2012 Z-Ware Ltd.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Amazon.EC2.Model;
 using Amazon.CloudWatch.Model;
+using ZAws.Console;
+using System.Threading;
 
 namespace ZAws
 {
@@ -15,17 +33,19 @@ namespace ZAws
         public ZAwsEc2(ZAwsEc2Controller controller, Amazon.EC2.Model.Reservation res)
             : base(controller)
         {
-            Update(res);
-
             StatisticsValid = false;
 
             LatestBootConsoleTimestamp = "";
             ConsoleOutput = "";
 
-            ConfigureAppsWhenBootingComplete = myController.HandleNewEc2Instance(this);
+            Update(res);
+
+            Trace.WriteLine("Now will see to configure new applications.");
+            ConfigureAppsWhenBootingComplete = myController.HandleNewEc2Instance(this) ? 3 : 0;
+            Trace.WriteLine("ConfigureAppsWhenBootingComplete = " + ConfigureAppsWhenBootingComplete.ToString());
         }
 
-        bool ConfigureAppsWhenBootingComplete;
+        int ConfigureAppsWhenBootingComplete = 0;
 
         public override string Name
         {
@@ -87,6 +107,16 @@ namespace ZAws
         protected override bool DoUpdate(object responseData)
         {
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.Reservation), "Wrong data passed to the object for update.");
+
+            /*
+            //First time public DNS is received, configure apps
+            if (Reservation != null && string.IsNullOrWhiteSpace(InstanceId)
+                && !string.IsNullOrWhiteSpace(((Amazon.EC2.Model.Reservation)responseData).RunningInstance[0].InstanceId))
+            {
+                Trace.Wri
+                ConfigureAppsWhenBootingComplete = myController.HandleNewEc2Instance(this);
+            }
+            */
             Reservation = (Amazon.EC2.Model.Reservation)responseData;
             return true;
         }
@@ -186,97 +216,104 @@ namespace ZAws
         internal void UpdateInfo()
         {
             bool Change = false;
-            /*
-            var resp = myController.CloudWatch.ListMetrics(new Amazon.CloudWatch.Model.ListMetricsRequest()
-            
-                                                                .WithNamespace("AWS/EC2")
-                                                                
-                                                                .WithDimensions(new DimensionFilter()
-                                                                                            .WithName("InstanceId")
-                                                                                            .WithValue(this.InstanceId)));
-            */
-            var resp2 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
-                                                                .WithNamespace("AWS/EC2")
-                                                                
-                                                                .WithDimensions(new Dimension()
-                                                                                            .WithName("InstanceId")
-                                                                                            .WithValue(this.InstanceId))
-                                                                 
-                                                                .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
-                                                                .WithEndTime(DateTime.Now.ToUniversalTime())
-                                                                .WithPeriod(300)
-                                                                .WithMetricName("CPUUtilization")
-                                                                .WithUnit("Percent")
-                                                                .WithStatistics("Average","Maximum"));
 
-            if (resp2.GetMetricStatisticsResult.Datapoints.Count > 0)
+            if (this.Status == Ec2Status.Running)
             {
 
-                int CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Maximum;
-                if (CPUUtilizationTemp != CPUUtilizationMax)
+                var resp2 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
+                                                                    .WithNamespace("AWS/EC2")
+
+                                                                    .WithDimensions(new Dimension()
+                                                                                                .WithName("InstanceId")
+                                                                                                .WithValue(this.InstanceId))
+
+                                                                    .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
+                                                                    .WithEndTime(DateTime.Now.ToUniversalTime())
+                                                                    .WithPeriod(300)
+                                                                    .WithMetricName("CPUUtilization")
+                                                                    .WithUnit("Percent")
+                                                                    .WithStatistics("Average", "Maximum"));
+
+                if (resp2.GetMetricStatisticsResult.Datapoints.Count > 0)
                 {
-                    CPUUtilizationMax = CPUUtilizationTemp;
-                    Change = true;
-                } 
-                CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Average;
-                if (CPUUtilizationTemp != CPUUtilizationAvg)
-                {
-                    CPUUtilizationAvg = CPUUtilizationTemp;
-                    Change = true;
+
+                    int CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Maximum;
+                    if (CPUUtilizationTemp != CPUUtilizationMax)
+                    {
+                        CPUUtilizationMax = CPUUtilizationTemp;
+                        Change = true;
+                    }
+                    CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Average;
+                    if (CPUUtilizationTemp != CPUUtilizationAvg)
+                    {
+                        CPUUtilizationAvg = CPUUtilizationTemp;
+                        Change = true;
+                    }
+                    StatisticsValid = true;
                 }
-                StatisticsValid = true;
-            }
 
-            var resp3 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
-                                                                .WithNamespace("AWS/EC2")
+                var resp3 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
+                                                                    .WithNamespace("AWS/EC2")
 
-                                                                .WithDimensions(new Dimension()
-                                                                                            .WithName("InstanceId")
-                                                                                            .WithValue(this.InstanceId))
+                                                                    .WithDimensions(new Dimension()
+                                                                                                .WithName("InstanceId")
+                                                                                                .WithValue(this.InstanceId))
 
-                                                                .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
-                                                                .WithEndTime(DateTime.Now.ToUniversalTime())
-                                                                .WithPeriod(300)
-                                                                .WithMetricName("NetworkOut")
-                                                                .WithUnit("Bytes")
-                                                                .WithStatistics("Sum"));
-            if (resp3.GetMetricStatisticsResult.Datapoints.Count > 0)
-            {
-                int NetworkOutRecent5MinTemp = (int)resp3.GetMetricStatisticsResult.Datapoints[resp3.GetMetricStatisticsResult.Datapoints.Count - 1].Sum;
-                if (NetworkOutRecent5MinTemp != NetworkOutRecent5Min)
+                                                                    .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
+                                                                    .WithEndTime(DateTime.Now.ToUniversalTime())
+                                                                    .WithPeriod(300)
+                                                                    .WithMetricName("NetworkOut")
+                                                                    .WithUnit("Bytes")
+                                                                    .WithStatistics("Sum"));
+                if (resp3.GetMetricStatisticsResult.Datapoints.Count > 0)
                 {
-                    NetworkOutRecent5Min = NetworkOutRecent5MinTemp;
-                    Change = true;
+                    int NetworkOutRecent5MinTemp = (int)resp3.GetMetricStatisticsResult.Datapoints[resp3.GetMetricStatisticsResult.Datapoints.Count - 1].Sum;
+                    if (NetworkOutRecent5MinTemp != NetworkOutRecent5Min)
+                    {
+                        NetworkOutRecent5Min = NetworkOutRecent5MinTemp;
+                        Change = true;
+                    }
+                    StatisticsValid = true;
                 }
-                StatisticsValid = true;
-            }
 
-            if (Change)
-            {
-                this.TriggerStatusChanged();
+                if (Change)
+                {
+                    this.TriggerStatusChanged();
+                }
             }
-
             //check terminal
 
-            Amazon.EC2.Model.GetConsoleOutputResponse resp =
-                myController.ec2.GetConsoleOutput(new Amazon.EC2.Model.GetConsoleOutputRequest()
-                                        .WithInstanceId(this.InstanceId));
 
-            if (LatestBootConsoleTimestamp != resp.GetConsoleOutputResult.ConsoleOutput.Timestamp)
+            if (this.Status != Ec2Status.Running || string.IsNullOrWhiteSpace(this.ConsoleOutput))
             {
-                LatestBootConsoleTimestamp = resp.GetConsoleOutputResult.ConsoleOutput.Timestamp;
+                Amazon.EC2.Model.GetConsoleOutputResponse resp =
+                    myController.ec2.GetConsoleOutput(new Amazon.EC2.Model.GetConsoleOutputRequest()
+                                            .WithInstanceId(this.InstanceId));
 
-
-                ConsoleOutput = Encoding.UTF8.GetString(Convert.FromBase64String(resp.GetConsoleOutputResult.ConsoleOutput.Output));
-
-                if(ConsoleUpdate != null)
+                if (LatestBootConsoleTimestamp != resp.GetConsoleOutputResult.ConsoleOutput.Timestamp)
                 {
-                    ConsoleUpdate(this, new NewConceolOutputEventArgs(ConsoleOutput, LatestBootConsoleTimestamp));
+                    LatestBootConsoleTimestamp = resp.GetConsoleOutputResult.ConsoleOutput.Timestamp;
+
+
+                    ConsoleOutput = Encoding.UTF8.GetString(Convert.FromBase64String(resp.GetConsoleOutputResult.ConsoleOutput.Output));
+
+                    if (ConsoleUpdate != null)
+                    {
+                        ConsoleUpdate(this, new NewConceolOutputEventArgs(ConsoleOutput, LatestBootConsoleTimestamp));
+                    }
                 }
-            }
-            if (this.ConfigureAppsWhenBootingComplete)
-            {
-                ConfigureAppsOnBootComplete();
+                if (this.ConfigureAppsWhenBootingComplete > 0)
+                {
+                    try
+                    {
+                        ConfigureAppsOnBootComplete();
+                    }
+                    catch (Exception ex)
+                    {
+                        Program.TraceLine("Error while configuring apps on boot complete, reason: ", ex);
+                        ConfigureAppsWhenBootingComplete--;
+                    }
+                }
             }
         }
 
@@ -289,16 +326,26 @@ namespace ZAws
             }
 
             //We will hardcode this for a while
+            Program.TraceLine("Configuring apps through SSH");
+            Program.Tracer.Trace(false, "ssh>" + SshClient.GetResponse().Replace("\n", "\nssh>"));
+            //Program.Tracer.TraceLine(false, "sudo su");
             this.SshClient.SendLine("sudo su", true);
+            Program.Tracer.Trace(false, SshClient.GetResponse().Replace("\n", "\nssh>"));
             foreach (var app in this.myController.runningApps)
             {
                 if (app.DeployedOnInstanceId == this.InstanceId)
                 {
-                    this.SshClient.SendLine(string.Format("bash /var/rails_apps/{0}/STARTME > /var/log/app_init_{0}", app.AppName), true);
+                    //Program.Tracer.TraceLine(false, "bash /var/rails_apps/{0}/STARTME > /var/log/app_init_{0}", app.AppName);
+                    this.SshClient.SendLine(string.Format("bash /var/rails_apps/{0}/STARTME" /* > /var/log/app_init_{0}"*/, app.AppName), true, 10 * 60 * 1000);
+                    Program.Tracer.Trace(false, SshClient.GetResponse().Replace("\n", "\nssh>"));
                 }
             }
             this.SshClient.SendLine("reboot");
-            ConfigureAppsWhenBootingComplete = false;
+            Thread.Sleep(1000);
+            Program.Tracer.Trace(false, SshClient.GetResponse().Replace("\n", "\nssh>"));
+            this.SshClient.Close();
+            Program.Tracer.TraceLine("\nssh>SSH DISCONNECTED.");
+            ConfigureAppsWhenBootingComplete = 0;
         }
 
         public class NewConceolOutputEventArgs : EventArgs
@@ -327,6 +374,7 @@ namespace ZAws
         {
             if (sshClient != null)
             {
+                Program.TraceLine("Closing SSH interface to {0}", this.Reservation.RunningInstance[0].PublicDnsName);
                 sshClient.Close();
                 sshClient = null;
             }
@@ -337,6 +385,7 @@ namespace ZAws
             {
                 if (sshClient == null)
                 {
+                    Program.TraceLine("Opening SSH interface to {0}", this.Reservation.RunningInstance[0].PublicDnsName);
                     sshClient = new ZawsSshClient(this.Reservation.RunningInstance[0].PublicDnsName, "ec2-user", "", PrivateKeyFile + ".ssh2");
                 }
                 return sshClient;

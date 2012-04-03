@@ -1,15 +1,52 @@
+========================================
+
+License and attributions
+
+Copyright 2012 Z-Ware Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This project includes a binery library of Granados:
+            Copyright (c) 2003 Routrek Networks, Inc.  All Rights Reserved.
+            Copyright(c) 2002 Chew Keong TAN
+          Granados is licensed under Apache 1.1 license:
+            http://www.apache.org/licenses/LICENSE-1.1
+          Source file and more project information:
+            http://granados.sourceforge.net/
+            
+          Many thanks to Granados people, as well as Dreico for the following article:
+            http://social.msdn.microsoft.com/Forums/eu/netfxnetcom/thread/e554ebc5-7b74-415f-8ac8-d5dc3dcaf1c5
+            
+This project references AWSSDK for .NET. Download installation package before building this project from: 
+          http://aws.amazon.com/sdkfornet/
+
+
+
+========================================
+
 ZAws - Z-Ware AWS Console
 
 This application provides OO .NET Interface towards AWS API and a simple UI that can be used to test the interface and also to monitor your services.
 
 To use it, modify the App.Config file to contain your keys and regions and then rebuild the application and start it.
 
-The goal of the project is to eventually suport all services and all features of AWS that Z-Ware itself is using. The projects starts with EC2, S3, IAM and Route53.
+The goal of the project is to eventually suport all services and all features of AWS that Z-Ware itself is using. The projects starts with EC2, and Route53.
 
 Notes:
 
-- At this point this application works only with the Europe region servers (where it matters). Global support will be added later.
-- We do not YET handle exceptions properly.
+- At this point this application works only with the Europe region servers (where it matters). Global support will be added later. Actual choice in the Launch dialog is fake.
+- While launching applications actually works, EC2 is showing some attitude towards using rvm in the install script. To avoid this problem, we will run STARTME script from the root folder of the application over SSH terminal - make sure that this script contains neccessary initialization instructions, starting with 'bundle install', all needed rake tasks and similar.
+- After deployment, instance will restart and apache (with Passenger) will start start on boot - but only fro msecond boot.
 
 ========================================
 
