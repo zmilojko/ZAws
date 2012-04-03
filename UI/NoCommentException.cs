@@ -14,17 +14,14 @@
 //   limitations under the License.
 //
 ///////////////////////////////////////////////////////////////////////////////
-using System.Windows.Forms;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace ZAws.Console
 {
-    public class ZawsListView : ListView
+    class NoCommentException : Exception
     {
-        public ZawsListView()
-            : base()
-        {
-            DoubleBuffered = true;
-        }
     }
 }

@@ -1,4 +1,20 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////////////
+//   Copyright 2012 Z-Ware Ltd.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,7 +23,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
-
 namespace ZAws.Console
 {
     public partial class MainView : Form
@@ -15,6 +30,17 @@ namespace ZAws.Console
         public MainView()
         {
             InitializeComponent();
+
+            buttonStart.Click += Do.HandleInZawsUi(buttonStart_Click, "Successfully sent Start EC2 command.", "Error while sending EC2 start command, reason: {0}");
+            buttonStop.Click += Do.HandleInZawsUi(buttonStop_Click, "Successfully sent Stop EC2 command.", "Error while sending EC2 stop command, reason: {0}");
+            buttonLaunchEc2Instance.Click += Do.HandleInZawsUi(buttonLaunchEc2Instance_Click, "Successfully sent Run EC2 Instance (Launch Instance) command.", "Error while sending Run EC2 Instance command, reason: {0}");
+            buttonTerminal.Click += Do.HandleInZawsUi(buttonTerminal_Click, "Successfully started SSH terminal application.", "Error while trying to start terminal application, reason: {0}");
+            buttonFileBrowser.Click += Do.HandleInZawsUi(buttonFileBrowser_Click, "Successfully started SFTP file browser.", "Error while starting SFTP file browser, reason: {0}");
+            buttonIpNew.Click += Do.HandleInZawsUi(buttonIpNew_Click, "Successfully sent Allocate IP command.", "Error while sending EC2 start command, reason: {0}");
+            buttonIpAssociate.Click += Do.HandleInZawsUi(buttonIpAssociate_Click, "Successfully sent IP Associate/Disassociate command.", "Error while sending IP Associate/Disassociate command, reason: {0}");
+            buttonDnsNew.Click += Do.HandleInZawsUi(buttonDnsNew_Click, "Successfully sent Create New Hsoted Zone command.", "Error while sending Create New Hsoted Zone command, reason: {0}");
+            buttonDelete.Click += Do.HandleInZawsUi(buttonDelete_Click, "Successfully sent delete object command(s).", "Error while sending delete object command(s), reason: {0}. Note that some objects might have been deleted, while some were not.");
+            buttonWWW.Click += Do.HandleInZawsUi(buttonWWW_Click, "Showing object in a Web browser", "Error while trying to show an object in a web browser, reason: {0}");
         }
 
         ZAwsEc2Controller controller = new ZAwsEc2Controller();
@@ -33,6 +59,33 @@ namespace ZAws.Console
             awsListView.Groups.Add(new ListViewGroup("EC2x","Other EC2 Objects"));
 
             awsListView_SelectedIndexChanged(sender, e);
+
+            Program.Tracer.NewTrace += new EventHandler<NewTraceEventArgs>(Tracer_NewTrace);
+            Program.TraceLine("Console started");
+        }
+
+        void Tracer_NewTrace(object sender, NewTraceEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new EventHandler<NewTraceEventArgs>(Tracer_NewTrace), sender, e);
+                return;
+            }
+
+            //Check if the textbox is scrolled to the bottom
+            bool lastLineVisible = textBoxTrace.SelectionStart > textBoxTrace.Text.Length - 100;
+
+            this.textBoxTrace.Text += e.Trace;
+            if (textBoxTrace.Text.Length > 10000)
+            {
+                textBoxTrace.Text = textBoxTrace.Text.Substring(textBoxTrace.Text.Length - 5000);
+            }
+
+            if (lastLineVisible)
+            {
+                textBoxTrace.SelectionStart = textBoxTrace.Text.Length;
+                textBoxTrace.ScrollToCaret();
+            }
         }
 
         void controller_NewObject(object sender, ZAwsEc2Controller.ZAwsNewObjectEventArgs e)
@@ -119,14 +172,16 @@ namespace ZAws.Console
             foreach (Control ctrl in Controls)
             {
                 if(ctrl.GetType() == typeof(Button)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width; }
-                if(ctrl.GetType() == typeof(Label)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width - 3; }
-
+                if (ctrl.GetType() == typeof(Label)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width - 3; }
+                if (ctrl.GetType() == typeof(PictureBox)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width - 3; }
             }
 
-            awsListView.Left = 12;
-            awsListView.Top = 12;
-            awsListView.Height = this.ClientSize.Height - 24;
-            awsListView.Width = buttonStart.Left - 20;
+
+
+            splitContainer.Left = 12;
+            splitContainer.Top = 12;
+            splitContainer.Height = this.ClientSize.Height - 24;
+            splitContainer.Width = buttonStart.Left - 20;
 
             //Size of tiles - this should amke ti minimum 100, while filling the area.
             int c = awsListView.Width / 100;
@@ -304,7 +359,6 @@ namespace ZAws.Console
 
         private void awsListView_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
             if (this.InvokeRequired)
             {
                 //Following Invoknig must be asynchronous, so not to cause deadlock with the Disconnect handler.
@@ -369,8 +423,13 @@ namespace ZAws.Console
             bool Amipresent = false;
             bool secGroupPresent = false;
             bool secKeyPresent = false;
+            bool wwwEnabled = false;
             foreach (ListViewItem item in awsListView.SelectedItems)
             {
+                wwwEnabled |= (awsListView.SelectedItems.Count == 1 &&
+                    (awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsEc2)
+                      || awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsElasticIp)
+                      || awsListView.SelectedItems[0].Tag.GetType() == typeof(ZAwsHostedZone)));
                 if (item.Tag.GetType() == typeof(ZAwsAmi)) 
                 {
                     if (Amipresent)
@@ -400,6 +459,7 @@ namespace ZAws.Console
                 }
             }
             buttonLaunchEc2Instance.Enabled = Amipresent && secGroupPresent && secKeyPresent;
+            buttonWWW.Enabled = wwwEnabled;
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -509,6 +569,25 @@ namespace ZAws.Console
             }
         }
 
+        private void buttonWWW_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in awsListView.SelectedItems)
+            {
+                if (item.Tag.GetType() == typeof(ZAwsEc2))
+                {
+                    Program.OpenWebBrowser("http://" + ((ZAwsEc2)item.Tag).Reservation.RunningInstance[0].PublicDnsName);
+                } 
+                if (item.Tag.GetType() == typeof(ZAwsElasticIp))
+                {
+                    Program.OpenWebBrowser("http://" + ((ZAwsElasticIp)item.Tag).Name);
+                } 
+                if (item.Tag.GetType() == typeof(ZAwsHostedZone))
+                {
+                    Program.OpenWebBrowser("http://" + ((ZAwsHostedZone)item.Tag).Name);
+                }
+            }
+        }
+
         private void buttonIpNew_Click(object sender, EventArgs e)
         {
             controller.AllocateIp();
@@ -551,7 +630,10 @@ namespace ZAws.Console
 
         private void buttonDnsNew_Click(object sender, EventArgs e)
         {
-            new DlgNewHostedZone(controller).ShowDialog();
+            if(!(new DlgNewHostedZone(controller).ShowDialog() == System.Windows.Forms.DialogResult.OK))
+            {
+                throw new NoCommentException();
+            }
         }
 
         private void awsListView_DoubleClick(object sender, EventArgs e)

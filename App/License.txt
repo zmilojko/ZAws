@@ -1,0 +1,43 @@
+Copyright 2012 Z-Ware Ltd.
+
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL ROUTREK NETWORKS, INC. OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This work uses Granados SW, which is inlcluded in this package in binary form.
+Granados SW belongs to:
+       Copyright (c) 2003 Routrek Networks, Inc.  All Rights Reserved.
+       Copyright(c) 2002 Chew Keong TAN
+
+and is disctributed under Apache 1.1 license: 
+                   http://www.apache.org/licenses/LICENSE-1.1
+                   
+For more info on Granados SSH Software, visit http://granados.sourceforge.net/.
+
+Many thanks to Dreico, for the only example of the Granados usage that 
+Google could find: http://social.msdn.microsoft.com/Forums/eu/netfxnetcom/thread/e554ebc5-7b74-415f-8ac8-d5dc3dcaf1c5
+                   
+Many thanks guys!
+
+More info about the project: http://zwr.fi

@@ -1,10 +1,27 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////////////
+//   Copyright 2012 Z-Ware Ltd.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Amazon.Route53.Model;
 using System.Threading;
+using ZAws.Console;
 
 namespace ZAws
 {
@@ -151,18 +168,27 @@ namespace ZAws
             }
         }
 
-        internal void AddRecord(ResourceRecordSet s)
+        internal bool AddRecord(ResourceRecordSet s)
         {
-            ChangeResourceRecordSetsResponse resp =
-            myController.route53.ChangeResourceRecordSets(new ChangeResourceRecordSetsRequest()
-                                                                .WithHostedZoneId(this.ResponseData.Id)
-                                                                .WithChangeBatch(new ChangeBatch()
-                                                                                    .WithChanges(
-                                                                                        new Change()
-                                                                                            .WithAction("CREATE")
-                                                                                            .WithResourceRecordSet(s))));
-            Thread.Sleep(2000);
-            UpdateInfo();
+            try
+            {
+                ChangeResourceRecordSetsResponse resp =
+                myController.route53.ChangeResourceRecordSets(new ChangeResourceRecordSetsRequest()
+                                                                    .WithHostedZoneId(this.ResponseData.Id)
+                                                                    .WithChangeBatch(new ChangeBatch()
+                                                                                        .WithChanges(
+                                                                                            new Change()
+                                                                                                .WithAction("CREATE")
+                                                                                                .WithResourceRecordSet(s))));
+                Thread.Sleep(2000);
+                UpdateInfo();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Program.TraceLine("Failed adding a recordset, reason: ", ex);
+                return false;
+            }
         }
 
         internal void DeleteRecord(ResourceRecordSet s)

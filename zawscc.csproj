@@ -93,6 +93,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App\Tracer.cs" />
+    <Compile Include="App\ZAwsButtonHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\NoCommentException.cs" />
     <Compile Include="UI\PopupEc2Output.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -127,7 +131,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="App\Program.cs" />
-    <Compile Include="App\assemblyinfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
