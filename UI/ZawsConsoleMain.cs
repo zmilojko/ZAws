@@ -30,7 +30,6 @@ namespace ZAws.Console
         public MainView()
         {
             InitializeComponent();
-
             buttonStart.Click += Do.HandleInZawsUi(buttonStart_Click, "Successfully sent Start EC2 command.", "Error while sending EC2 start command, reason: {0}");
             buttonStop.Click += Do.HandleInZawsUi(buttonStop_Click, "Successfully sent Stop EC2 command.", "Error while sending EC2 stop command, reason: {0}");
             buttonLaunchEc2Instance.Click += Do.HandleInZawsUi(buttonLaunchEc2Instance_Click, "Successfully sent Run EC2 Instance (Launch Instance) command.", "Error while sending Run EC2 Instance command, reason: {0}");
@@ -646,9 +645,15 @@ namespace ZAws.Console
 
             if (obj.GetType() == typeof(ZAwsEc2))
             {
-                PopupEc2Output popup = new PopupEc2Output(controller, (ZAwsEc2)obj);
+                Program.LaunchPopupForm<PopupEc2Properties>(obj);
+                /*
+                PopupEc2Properties popup2 = new PopupEc2Properties((ZAwsEc2)obj);
+                popup2.Show();
+                
+                PopupEc2Output popup = new PopupEc2Output((ZAwsEc2)obj);
                 popup.Show();
                 //((ZAwsEc2)obj).StartTerminal();
+                 * */
                 return;
             }
             if (obj.GetType() == typeof(ZAwsHostedZone))

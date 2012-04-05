@@ -23,7 +23,7 @@ namespace ZAws
 {
     abstract class ZAwsObject
     {
-        protected readonly ZAwsEc2Controller myController;
+        public readonly ZAwsEc2Controller myController;
         protected ZAwsObject(ZAwsEc2Controller controller)
         {
             myController = controller;

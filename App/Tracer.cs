@@ -62,16 +62,16 @@ namespace ZAws.Console
         {
             lock (lockObject)
             {
-                string s;
+                string s = (includeTimeSTamp ? DateTime.UtcNow.ToString("hh:mm:ss") + "> " : "");
                 if (line_parameters == null || line_parameters.Length == 0)
                 {
-                    s = line;
+                    s += line;
                 }
                 else
                 {
                     try
                     {
-                        s = (includeTimeSTamp ? DateTime.UtcNow.ToString("hh:mm:ss") + "> " : "") + string.Format(line, line_parameters);
+                        s += string.Format(line, line_parameters);
                     }
                     catch (FormatException)
                     {

@@ -204,5 +204,35 @@ namespace ZAws.Console
         {
             System.Diagnostics.Process.Start(url);
         }
+
+        static List<ZAwsPopupForm> activePopupForms = new List<ZAwsPopupForm>();
+        
+        internal static void LaunchPopupForm<F>(ZAwsObject obj) where F : ZAwsPopupForm
+        {
+            foreach (var f in activePopupForms)
+            {
+                if (f.GetType() == typeof(F) && f.ServedType == obj.GetType() && obj == f.MyObj)
+                {
+                    f.Select();
+                    f.Focus();
+                    return;
+                }
+            }
+
+            F newPopup = (F)Activator.CreateInstance(typeof(F), obj);
+            newPopup.Show();
+            activePopupForms.Add(newPopup);
+        }
+        internal static void UnrgisterPopupForm(ZAwsPopupForm zAwsPopupForm)
+        {
+            foreach (var f in activePopupForms)
+            {
+                if (f == zAwsPopupForm)
+                {
+                    activePopupForms.Remove(f);
+                    return;
+                }
+            }
+        }
     }
 }

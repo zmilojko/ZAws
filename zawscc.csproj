@@ -127,6 +127,12 @@
     <Compile Include="UI\DlgViewDnsRecords.Designer.cs">
       <DependentUpon>DlgViewDnsRecords.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\PopupEc2Properties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\PopupEc2Properties.Designer.cs">
+      <DependentUpon>PopupEc2Properties.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\ZAwsListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -135,6 +141,9 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ZAwsPopupForm.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ZawsSshClient.cs" />
     <Compile Include="ZAws\ZAwsSpotRequest.cs" />
@@ -212,6 +221,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\DlgViewDnsRecords.resx">
       <DependentUpon>DlgViewDnsRecords.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PopupEc2Properties.resx">
+      <DependentUpon>PopupEc2Properties.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ZawsConsoleMain.resx">
       <DependentUpon>ZawsConsoleMain.cs</DependentUpon>

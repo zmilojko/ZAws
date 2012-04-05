@@ -27,19 +27,21 @@ using System.Threading;
 
 namespace ZAws.Console
 {
-    partial class PopupEc2Output : Form
+    partial class PopupEc2Output : ZAwsPopupForm
     {
-        public PopupEc2Output(ZAwsEc2Controller controller, ZAwsEc2 ec2)
+        public PopupEc2Output(ZAwsEc2 ec2)
+            : base(ec2)
         {
-            Ec2Instance = ec2;
-            Controller = controller;
-
             InitializeComponent();
         }
 
-        ZAwsEc2 Ec2Instance;
-        ZAwsEc2Controller Controller;
-
+        ZAwsEc2 Ec2Instance
+        {
+            get
+            {
+                return (ZAwsEc2)base.MyObj;
+            }
+        }
         private void PopupEc2Output_Load(object sender, EventArgs e)
         {
             this.Text = "Boot console output for "+Ec2Instance.Name+" - waiting for output";
@@ -60,17 +62,6 @@ namespace ZAws.Console
             textBox1.Text = e.Output;
             textBox1.SelectionStart = textBox1.Text.Length;
             textBox1.ScrollToCaret();
-
-            if(!string.IsNullOrWhiteSpace(textBox1.Text))
-            {
-                SystemSounds.Beep.Play();
-                Thread.Sleep(400);
-                SystemSounds.Beep.Play();
-                Thread.Sleep(400);
-                SystemSounds.Beep.Play();
-                Thread.Sleep(400);
-                SystemSounds.Beep.Play();
-            }
         }
 
         private void PopupEc2Output_SizeChanged(object sender, EventArgs e)
