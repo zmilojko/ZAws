@@ -194,6 +194,7 @@ namespace ZAws
         void MonitorFunction()
         {
             Program.TraceLine("Monitoring thread started...");
+            Program.MonitorMessage = "Monitor starting...";
             while (true)
             {
                 try
@@ -207,54 +208,65 @@ namespace ZAws
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeInstancesResponse respEc2 = GetRunningInstances();
                     UpdateClassOfObjects(currentStatusEc2, respEc2.DescribeInstancesResult.Reservation);
-
+                    Program.MonitorMessage = "Updated EC2s...";
                     foreach (ZAwsEc2 ec2Instance in CurrentEc2s)
                     {
                         lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                         ec2Instance.UpdateInfo();
+                        Program.MonitorMessage = "Updated EC2 " + ec2Instance.Name;
                     }
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeAddressesResponse respElasitIp = GetElasticIps();
                     UpdateClassOfObjects(currentStatusElIps, respElasitIp.DescribeAddressesResult.Address);
+                    Program.MonitorMessage = "Updated elastic IPs";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     ListHostedZonesResponse route53Zones = GetHostedZones();
                     UpdateClassOfObjects(currentHostedZones, route53Zones.ListHostedZonesResult.HostedZones);
+                    Program.MonitorMessage = "Updated hosted zones...";
 
                     foreach (ZAwsHostedZone zone in CurrentHostedZones)
                     {
                         lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                         zone.UpdateInfo();
+                        Program.MonitorMessage = "Updated zone " + zone.Name;
                     }
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     ListBucketsResponse s3Buckects = GetBuckets();
                     UpdateClassOfObjects(currentS3Buckets, s3Buckects.Buckets);
+                    Program.MonitorMessage = "Updated S3 Buckets...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeSnapshotsResponse respEc2Snapshots = GetSnapshots();
                     UpdateClassOfObjects(currentSnapshots, respEc2Snapshots.DescribeSnapshotsResult.Snapshot);
+                    Program.MonitorMessage = "Updated EC2 Snapshots...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeKeyPairsResponse respKeyPairs = GetKeyPairs();
                     UpdateClassOfObjects(currentKeyPairs, respKeyPairs.DescribeKeyPairsResult.KeyPair);
+                    Program.MonitorMessage = "Updated KeyPairs...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeSecurityGroupsResponse respSecGroups = GetSecurityGroups();
                     UpdateClassOfObjects(currentSecGroups, respSecGroups.DescribeSecurityGroupsResult.SecurityGroup);
+                    Program.MonitorMessage = "Updated Sec Groups...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeImagesResponse respAmis = GetAmis();
                     UpdateClassOfObjects(currentAmis, respAmis.DescribeImagesResult.Image);
+                    Program.MonitorMessage = "Updated AMIs...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeVolumesResponse respEbsVolumes = GetEbsVolumes();
                     UpdateClassOfObjects(currentEbsVolumes, respEbsVolumes.DescribeVolumesResult.Volume);
+                    Program.MonitorMessage = "Updated EBS volumes...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeSpotInstanceRequestsResponse respSpotRequests = GetSpotRequests();
                     UpdateClassOfObjects(currentSpotRequests, respSpotRequests.DescribeSpotInstanceRequestsResult.SpotInstanceRequest);
+                    Program.MonitorMessage = "Updated spot requests...";
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
 
@@ -267,13 +279,19 @@ namespace ZAws
                 catch (Exception ex)
                 {
                     Program.TraceLine("Monitoring thread encountered an error. Will restart in {0}...", ex, ThreadInRecovery ? "1 minute" : "5 seconds");
-                    for (int i = 0; i < (ThreadInRecovery ? 600: 50); i++)
+                    Program.MonitorMessage = "Monitor paused...";
+                    for (int i = 0; i < (ThreadInRecovery ? 600 : 50); i++)
                     {
                         lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                         Thread.Sleep(100);
                     }
                     Program.TraceLine("Monitoring thread trying to recover...");
+                    Program.MonitorMessage = "Monitor restarting...";
                     ThreadInRecovery = true;
+                }
+                finally
+                {
+                    if (!RunMonitoring) { Program.MonitorMessage = "Monitor stopped."; }
                 }
             }
         }

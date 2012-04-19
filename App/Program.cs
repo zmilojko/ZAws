@@ -54,6 +54,15 @@ namespace ZAws.Console
             }
         }
 
+        public static string MonitorMessage
+        {
+            set
+            {
+                theMainView.SetMonitorMessage(value);
+            }
+        }
+
+
         public static Tracer Tracer = new Tracer();
         public static void TraceLine(string line, params object[] line_parameters)
         {
@@ -63,6 +72,8 @@ namespace ZAws.Console
         {
             Tracer.TraceLine(line, ex, line_parameters);
         }
+
+        static ZAws.Console.MainView theMainView;
 
         [STAThread]
         public static void Main(string[] args)
@@ -74,7 +85,7 @@ namespace ZAws.Console
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ZAws.Console.MainView());
+            Application.Run(theMainView = new ZAws.Console.MainView());
         }
 
         static void c_ReceivedString(object sender, ZawsSshClient.ReceivedStringEventArgs e)

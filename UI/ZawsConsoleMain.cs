@@ -173,6 +173,7 @@ namespace ZAws.Console
                 if(ctrl.GetType() == typeof(Button)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width; }
                 if (ctrl.GetType() == typeof(Label)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width - 3; }
                 if (ctrl.GetType() == typeof(PictureBox)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width - 3; }
+                if (ctrl.GetType() == typeof(TextBox)) { ctrl.Left = this.ClientSize.Width - 12 - buttonStart.Width - 3; }
             }
 
 
@@ -185,6 +186,19 @@ namespace ZAws.Console
             //Size of tiles - this should amke ti minimum 100, while filling the area.
             int c = awsListView.Width / 100;
             awsListView.TileSize = new Size(105, 120);
+        }
+
+        private delegate void MyDelegate(string m);
+
+        public void SetMonitorMessage(string msg)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke((MyDelegate)delegate(string m) { SetMonitorMessage(m); }, msg);
+                return;
+            }
+            
+            textBox1.Text = msg;
         }
 
         private void MainView_FormClosed(object sender, FormClosedEventArgs e)
@@ -316,22 +330,27 @@ namespace ZAws.Console
             else if (e.Item.Tag.GetType() == typeof(ZAwsSnapshot))
             {
                 e.Graphics.DrawString("IMG", IconFont, Brushes.Blue, IconSpace);
+                e.Graphics.DrawString(((ZAwsObject)e.Item.Tag).Description, NameFont, Brushes.Black, DetailsSpace);
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsSecGroup))
             {
                 e.Graphics.DrawString("Sec", IconFont, Brushes.Blue, IconSpace);
+                e.Graphics.DrawString(((ZAwsObject)e.Item.Tag).Description, NameFont, Brushes.Black, DetailsSpace);
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsKeyPair))
             {
-                e.Graphics.DrawString("Keys", IconFont, Brushes.Blue, IconSpace);
+                e.Graphics.DrawString("Keys", IconFont, ((ZAwsKeyPair)e.Item.Tag).Available ? Brushes.Green : Brushes.Red, IconSpace);
+                e.Graphics.DrawString(((ZAwsObject)e.Item.Tag).Description, NameFont, Brushes.Black, DetailsSpace);
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsAmi))
             {
                 e.Graphics.DrawString("AMI", IconFont, Brushes.Purple, IconSpace);
+                e.Graphics.DrawString(((ZAwsObject)e.Item.Tag).Description, NameFont, Brushes.Black, DetailsSpace);
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsEbsVolume))
             {
                 e.Graphics.DrawString("EBS", IconFont, Brushes.Blue, IconSpace);
+                e.Graphics.DrawString(((ZAwsObject)e.Item.Tag).Description, NameFont, Brushes.Black, DetailsSpace);
             }
             else if (e.Item.Tag.GetType() == typeof(ZAwsSpotRequest))
             {
@@ -347,6 +366,7 @@ namespace ZAws.Console
                 }
 
                 e.Graphics.DrawString("SPOT", IconFont, b, IconSpace);
+                e.Graphics.DrawString(((ZAwsObject)e.Item.Tag).Description, NameFont, Brushes.Black, DetailsSpace);
             }
             else
             {

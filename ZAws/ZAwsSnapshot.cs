@@ -40,6 +40,14 @@ namespace ZAws
             }
         }
 
+        public override string Description
+        {
+            get
+            {
+                return ResponseData.Description;
+            }
+        }
+
         protected override bool DoUpdate(object responseData)
         {
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.Snapshot), "Wrong data passed to the object for update.");

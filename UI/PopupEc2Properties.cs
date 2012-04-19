@@ -30,10 +30,12 @@ namespace ZAws.Console
             buttonWWWip.Click += Do.HandleInZawsUi(buttonWWWip_Click, "Showing object in a Web browser", "Error while trying to show an object in a web browser, reason: {0}");
 
             buttonReboot.Click += Do.HandleInZawsUi(buttonReboot_Click, "Successfully sent Reboot EC2 command.", "Error while sending EC2 reboot command, reason: {0}");
-            buttonInstallApp.Click += Do.HandleInZawsUi(buttonInstallApp_Click, "Successfully installed App on EC2.", "Error while installing app, reason: {0}");
-            buttonRunScript.Click += Do.HandleInZawsUi(buttonRunScript_Click, "Successfully executed a script on EC2.", "Error while exeutnig script, reason: {0}");
             buttonChangeName.Click += Do.HandleInZawsUi(buttonChangeName_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
 
+            buttonMysqlAdmin.Click += Do.HandleInZawsUi(buttonMysqlAdmin_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
+            buttonMysqlBrowser.Click += Do.HandleInZawsUi(buttonMysqlBrowser_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
+
+            buttonAppsRefresh.Click += Do.HandleInZawsUi(buttonAppsRefresh_Click, "Apps info retrieved.", "Error while checking installed apps, reason: {0}");
 
             MyEC2.StatusChanged += new EventHandler(MyEC2_StatusChanged);
             MyEC2.ObjectDeleted += new EventHandler(MyEC2_ObjectDeleted);
@@ -60,16 +62,20 @@ namespace ZAws.Console
                 this.BeginInvoke(new EventHandler(MyEC2_StatusChanged), sender, e);
                 return;
             }
-            PopupEc2Properties_Load(sender, e);
+            RefreshInfo();
         }
 
-        private void PopupEc2Properties_Load(object sender, EventArgs e)
+        private void RefreshInfo()
         {
-            SettingInfo = true;
+            //SettingInfo = true;
             this.Text = string.Format("EC2 {0}, id={1}, {2}", MyEC2.Name, MyEC2.InstanceId, MyEC2.Status.ToString());
             if (buttonChangeName.Enabled == false)
             {
                 textBoxName.Text = MyEC2.Name;
+            }
+            else if (textBoxName.Text == MyEC2.Name)
+            {
+                textBoxName_TextChanged(null, null);
             }
             textBoxType.Text = MyEC2.Reservation.RunningInstance[0].InstanceType;
             textBoxZone.Text = MyEC2.Reservation.RunningInstance[0].Placement.AvailabilityZone;
@@ -82,9 +88,17 @@ namespace ZAws.Console
 
             buttonStart.Enabled = MyEC2.Status == ZAwsEc2.Ec2Status.Stopped;
             buttonStop.Enabled = buttonReboot.Enabled = MyEC2.Status == ZAwsEc2.Ec2Status.Running;
-            buttonTerminal.Enabled = buttonFileBrowser.Enabled = buttonInstallApp.Enabled =
-                buttonRunScript.Enabled = MyEC2.Status == ZAwsEc2.Ec2Status.Running;
-            SettingInfo = false;
+            buttonTerminal.Enabled = buttonFileBrowser.Enabled =
+                buttonRunScript.Enabled = buttonAppsNew.Enabled = buttonAppsRebootApache.Enabled =
+                buttonAppsRefresh.Enabled = buttonAppsUpdate.Enabled = (MyEC2.Status == ZAwsEc2.Ec2Status.Running);
+
+            //SettingInfo = false;
+        }
+
+        private void PopupEc2Properties_Load(object sender, EventArgs e)
+        {
+            RefreshInfo();
+            RefreshApps(false);
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -115,6 +129,50 @@ namespace ZAws.Console
                 MyEC2.StartSshFileBrowser();
             }
         }
+        private void buttonMysqlAdmin_Click(object sender, EventArgs e)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running)
+            {
+                MyEC2.ConnectApp(System.Configuration.ConfigurationManager.AppSettings["MySqlAdminApp"],
+                    System.Configuration.ConfigurationManager.AppSettings["MySqlAdminArgs"],
+                    System.Configuration.ConfigurationManager.AppSettings["MySqlUsername"],
+                    System.Configuration.ConfigurationManager.AppSettings["MySqlPassword"]);
+
+            }
+        }
+        private void buttonMysqlBrowser_Click(object sender, EventArgs e)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running)
+            {
+                MyEC2.ConnectApp(System.Configuration.ConfigurationManager.AppSettings["MySqlBrowserApp"],
+                    System.Configuration.ConfigurationManager.AppSettings["MySqlBrowserArgs"],
+                    System.Configuration.ConfigurationManager.AppSettings["MySqlUsername"],
+                    System.Configuration.ConfigurationManager.AppSettings["MySqlPassword"]);
+
+            }
+        }
+        #region App handling
+        private void buttonAppsRefresh_Click(object sender, EventArgs e)
+        {
+            RefreshApps(true);
+        }
+        void RefreshApps(bool force)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running)
+            {
+                listViewApps.Items.Clear(); 
+                foreach (ZAwsEc2.Application app in MyEC2.GetInstalledApps(force))
+                {
+                    var i = listViewApps.Items.Add(new ListViewItem(app.Name));
+                    i.SubItems.Add(app.Repo);
+                    i.SubItems.Add(app.URL);
+                    i.SubItems.Add(app.AppType.ToString());
+                    i.Tag = app;
+                }
+            }
+        }
+        #endregion 
+        
         private void buttonWWW_Click(object sender, EventArgs e)
         {
             Program.OpenWebBrowser("http://" + MyEC2.Reservation.RunningInstance[0].PublicDnsName);
@@ -124,10 +182,10 @@ namespace ZAws.Console
             Program.OpenWebBrowser("http://" + MyEC2.Reservation.RunningInstance[0].IpAddress);
         }
 
-        bool SettingInfo = false;
+        //bool SettingInfo = false;
         private void textBoxName_TextChanged(object sender, EventArgs e)
         {
-            if (!SettingInfo && textBoxName.Text != MyEC2.Name)
+            if (/*!SettingInfo &&*/ textBoxName.Text != MyEC2.Name)
             {
                 buttonChangeName.Enabled = true;
                 textBoxName.BackColor = Color.Orange;
@@ -162,7 +220,7 @@ namespace ZAws.Console
         }
         private void buttonChangeName_Click(object sender, EventArgs e)
         {
-
+            MyEC2.SetName(textBoxName.Text);
         }
         private void buttonRunScript_Click(object sender, EventArgs e)
         {

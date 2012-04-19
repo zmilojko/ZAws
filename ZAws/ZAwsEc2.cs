@@ -164,17 +164,24 @@ namespace ZAws
 
         internal void StartTerminal()
         {
-            
+            ConnectApp(System.Configuration.ConfigurationManager.AppSettings["SSHTerminalApp"],
+                System.Configuration.ConfigurationManager.AppSettings["SSHTerminaAppArgs"]);
+
+            /*
             string awsTerminalApp = System.Configuration.ConfigurationManager.AppSettings["SSHTerminalApp"];
             string awsTerminalCommandLines = string.Format(System.Configuration.ConfigurationManager.AppSettings["SSHTerminaAppArgs"],
                 this.Reservation.RunningInstance[0].PublicDnsName,
                 PrivateKeyFile + ".ppk");
 
             Process p = Process.Start(awsTerminalApp, awsTerminalCommandLines);
+             * */
         }
 
         internal void StartSshFileBrowser()
         {
+            ConnectApp(System.Configuration.ConfigurationManager.AppSettings["SSHFileBrowserApp"],
+                System.Configuration.ConfigurationManager.AppSettings["SSHFileBrowserAppArgs"]);
+            /*
             string awsKeyPath = System.Configuration.ConfigurationManager.AppSettings["SSHPrivateKeysDir"];
             string awsTerminalApp = System.Configuration.ConfigurationManager.AppSettings["SSHFileBrowserApp"];
             string awsTerminalCommandLines = string.Format(System.Configuration.ConfigurationManager.AppSettings["SSHFileBrowserAppArgs"],
@@ -182,6 +189,15 @@ namespace ZAws
                 awsKeyPath + this.Reservation.RunningInstance[0].KeyName + ".ppk");
 
             Process p = Process.Start(awsTerminalApp, awsTerminalCommandLines);
+             * */
+        }
+
+        internal void ConnectApp(string appLoc, string argPattern, params string[] command_line_arguments)
+        {
+            Process p = Process.Start(appLoc, string.Format(argPattern.Replace("{PublicDNS}", this.Reservation.RunningInstance[0].PublicDnsName)
+                .Replace("{PublicIP}", this.Reservation.RunningInstance[0].IpAddress)
+                .Replace("{PublicKeyFile}", PrivateKeyFile)
+                , command_line_arguments));
         }
 
         public bool StatisticsValid { get; private set; }
@@ -364,9 +380,14 @@ namespace ZAws
 
         public void SetName(string p)
         {
-             Amazon.EC2.Model.CreateTagsResponse response2 = myController.ec2.CreateTags(new Amazon.EC2.Model.CreateTagsRequest()
-                                                .WithResourceId(this.InstanceId)
-                                                .WithTag(new Amazon.EC2.Model.Tag().WithKey("Name").WithValue(Name)));
+            /*
+            Amazon.EC2.Model.DeleteTagsResponse response = myController.ec2.DeleteTags(new Amazon.EC2.Model.DeleteTagsRequest()
+                                               .WithResourceId(this.InstanceId)
+                                               .WithTag(new Amazon.EC2.Model.DeleteTags().WithKey("Name")));
+             */
+            Amazon.EC2.Model.CreateTagsResponse response2 = myController.ec2.CreateTags(new Amazon.EC2.Model.CreateTagsRequest()
+                                    .WithResourceId(this.InstanceId)
+                                    .WithTag(new Amazon.EC2.Model.Tag().WithKey("Name").WithValue(p)));
         }
 
         ZawsSshClient sshClient = null;
@@ -390,6 +411,74 @@ namespace ZAws
                 }
                 return sshClient;
             }
+        }
+
+        public enum ApplicationType { GENERIC, RAILS_APP };
+
+        public class Application
+        {
+            internal Application(ZAwsEc2 server, string name, string url, string repo, ApplicationType type)
+            {
+                Server = server;
+                Name = name;
+                URL = url;
+                Repo = repo;
+                AppType = type;
+            }
+            public readonly string Name;
+            public readonly string URL;
+            public readonly string Repo;
+            public readonly ApplicationType AppType;
+            public readonly ZAwsEc2 Server;
+        }
+
+        List<Application> installedApplications = null;
+
+        public Application[] GetInstalledApps()
+        {
+            return GetInstalledApps(false);
+        }
+        public Application[] GetInstalledApps(bool forceRefresh)
+        {
+            if (installedApplications == null || forceRefresh)
+            {
+                installedApplications = new List<Application>();
+                this.SshClient.SendLine("sudo su", true);
+                this.SshClient.GetResponse();
+                this.SshClient.SendLine("ls /etc/httpd/virtual_hosts/", true);
+                string resp;
+                Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+                string[] lsResp = resp.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 2; i < lsResp.Length - 2; i++)
+                {
+                    this.SshClient.SendLine("cat /etc/httpd/virtual_hosts/" + lsResp[i], true);
+                    Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+                    string[] lsResp2 = resp.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] pathSegments = lsResp2[7].Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                    ApplicationType t;
+                    string name;
+                    string path = lsResp2[7];
+                    
+                    if(pathSegments[pathSegments.Length - 1] == "public")
+                    {
+                        t = ApplicationType.RAILS_APP;
+                        name = pathSegments[pathSegments.Length - 2];
+                        path = path.Substring(0, path.LastIndexOf("/public"));
+                    }
+                    else
+                    {
+                        t = ApplicationType.GENERIC;
+                        name = pathSegments[pathSegments.Length - 1];
+                    }
+                    this.SshClient.SendLine("cd " + path, true);
+                    Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+                    this.SshClient.SendLine("git remote -v", true);
+                    Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+                    string[] lsResp3 = resp.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                    installedApplications.Add(new Application(this, name, lsResp2[5], lsResp3[3], t));                                  
+                }
+            }
+            return installedApplications.ToArray();
         }
     }
 }

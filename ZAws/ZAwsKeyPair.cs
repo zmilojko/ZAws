@@ -53,6 +53,18 @@ namespace ZAws
             return string.Equals(ResponseData.KeyFingerprint, ((Amazon.EC2.Model.KeyPair)responseData).KeyFingerprint);
         }
 
+        public bool Available
+        {
+            get
+            {
+                string awsKeyPath = System.Configuration.ConfigurationManager.AppSettings["SSHPrivateKeysDir"];
+                return System.IO.File.Exists(awsKeyPath + this.Name + ".pem")
+                    && System.IO.File.Exists(awsKeyPath + this.Name + ".ssh2")
+                    && System.IO.File.Exists(awsKeyPath + this.Name + ".ppk");
+            }
+        }
+
+
         protected override void DoDeleteObject()
         {
             Amazon.EC2.Model.DeleteKeyPairResponse resp = myController.ec2.DeleteKeyPair(new Amazon.EC2.Model.DeleteKeyPairRequest()

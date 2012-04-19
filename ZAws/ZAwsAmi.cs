@@ -44,6 +44,13 @@ namespace ZAws
                 return ResponseData.Name;
             }
         }
+        public override string Description
+        {
+            get
+            {
+                return "(" + ResponseData.ImageId + ")\n" + ResponseData.Description;
+            }
+        }
 
         protected override bool DoUpdate(object responseData)
         {

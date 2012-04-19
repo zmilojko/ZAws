@@ -59,5 +59,34 @@ namespace ZAws
                                                         new Amazon.EC2.Model.DeleteSecurityGroupRequest()
                                                                     .WithGroupId(this.ResponseData.GroupId));
         }
+
+        public override string Description
+        {
+            get
+            {
+                string s = "";
+                string p = "";
+                string r = "";
+                foreach (var i in this.ResponseData.IpPermission)
+                {
+                    string portnumber = ((int)i.FromPort).ToString();
+                    if(i.FromPort != i.ToPort)
+                    {
+                        portnumber += "-" + ((int)i.ToPort).ToString();
+                    }
+                    if(i.IpRange.Count != 1 || i.IpRange[0] != "0.0.0.0/0")
+                    {
+                        portnumber = "(" + portnumber + ")";
+                    }
+                    switch (i.IpProtocol)
+                    {
+                        case "tcp": if (s.Length == 0) { s = "tcp: "; } else { s += ", "; } s += portnumber; break;
+                        case "udp": if (p.Length == 0) { p = "\nudp: "; } else { p += ", "; } p += portnumber; break;
+                        case "icmp": if (r.Length == 0) { r = "\nicmp: "; } else { r += ", "; } r += portnumber; break;
+                    }
+                }
+                return s + p;
+            }
+        }
     }
 }

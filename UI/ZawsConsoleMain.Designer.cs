@@ -46,10 +46,11 @@
             this.buttonBucketFileBrowser = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.awsListView = new ZAws.Console.ZawsListView();
             this.textBoxTrace = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonWWW = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.awsListView = new ZAws.Console.ZawsListView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -225,21 +226,6 @@
             this.splitContainer.SplitterDistance = 258;
             this.splitContainer.TabIndex = 7;
             // 
-            // awsListView
-            // 
-            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.awsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.awsListView.Location = new System.Drawing.Point(0, 0);
-            this.awsListView.Name = "awsListView";
-            this.awsListView.OwnerDraw = true;
-            this.awsListView.Size = new System.Drawing.Size(371, 258);
-            this.awsListView.TabIndex = 0;
-            this.awsListView.UseCompatibleStateImageBehavior = false;
-            this.awsListView.View = System.Windows.Forms.View.Tile;
-            this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
-            this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
-            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
-            // 
             // textBoxTrace
             // 
             this.textBoxTrace.BackColor = System.Drawing.Color.White;
@@ -272,12 +258,39 @@
             this.buttonWWW.Text = "WWW";
             this.buttonWWW.UseVisualStyleBackColor = true;
             // 
+            // textBox1
+            // 
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox1.ForeColor = System.Drawing.Color.Gray;
+            this.textBox1.Location = new System.Drawing.Point(557, 502);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(74, 37);
+            this.textBox1.TabIndex = 10;
+            this.textBox1.Text = "Monitoring not started";
+            // 
+            // awsListView
+            // 
+            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.awsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.awsListView.Location = new System.Drawing.Point(0, 0);
+            this.awsListView.Name = "awsListView";
+            this.awsListView.OwnerDraw = true;
+            this.awsListView.Size = new System.Drawing.Size(371, 258);
+            this.awsListView.TabIndex = 0;
+            this.awsListView.UseCompatibleStateImageBehavior = false;
+            this.awsListView.View = System.Windows.Forms.View.Tile;
+            this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
+            this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
+            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(719, 636);
+            this.ClientSize = new System.Drawing.Size(719, 566);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.buttonWWW);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.splitContainer);
@@ -299,9 +312,9 @@
             this.Controls.Add(this.buttonStart);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(567, 502);
+            this.MinimumSize = new System.Drawing.Size(567, 600);
             this.Name = "MainView";
-            this.Text = "ZawsConsoleMain";
+            this.Text = "M";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainView_FormClosed);
             this.Load += new System.EventHandler(this.MainView_Load);
             this.Resize += new System.EventHandler(this.MainView_Resize);
@@ -339,5 +352,6 @@
         private System.Windows.Forms.TextBox textBoxTrace;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button buttonWWW;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

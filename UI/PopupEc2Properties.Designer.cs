@@ -28,6 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PopupEc2Properties));
             this.textBoxName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -54,12 +64,35 @@
             this.buttonTerminate = new System.Windows.Forms.Button();
             this.buttonTerminal = new System.Windows.Forms.Button();
             this.buttonFileBrowser = new System.Windows.Forms.Button();
-            this.buttonInstallApp = new System.Windows.Forms.Button();
             this.buttonRunScript = new System.Windows.Forms.Button();
-            this.buttonMonitor = new System.Windows.Forms.Button();
             this.buttonConsoleOutput = new System.Windows.Forms.Button();
             this.buttonWWW = new System.Windows.Forms.Button();
             this.buttonWWWip = new System.Windows.Forms.Button();
+            this.buttonMysqlAdmin = new System.Windows.Forms.Button();
+            this.buttonMysqlBrowser = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.listViewApps = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.buttonAppsNew = new System.Windows.Forms.Button();
+            this.buttonAppsUpdate = new System.Windows.Forms.Button();
+            this.buttonAppsRebootApache = new System.Windows.Forms.Button();
+            this.buttonAppsRefresh = new System.Windows.Forms.Button();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
             this.SuspendLayout();
             // 
             // textBoxName
@@ -82,6 +115,7 @@
             // 
             // textBoxType
             // 
+            this.textBoxType.BackColor = System.Drawing.Color.White;
             this.textBoxType.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxType.Location = new System.Drawing.Point(95, 38);
             this.textBoxType.Name = "textBoxType";
@@ -163,6 +197,7 @@
             // 
             // textBoxZone
             // 
+            this.textBoxZone.BackColor = System.Drawing.Color.White;
             this.textBoxZone.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxZone.Location = new System.Drawing.Point(95, 57);
             this.textBoxZone.Name = "textBoxZone";
@@ -172,6 +207,7 @@
             // 
             // textBoxSecGroups
             // 
+            this.textBoxSecGroups.BackColor = System.Drawing.Color.White;
             this.textBoxSecGroups.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxSecGroups.Location = new System.Drawing.Point(95, 76);
             this.textBoxSecGroups.Name = "textBoxSecGroups";
@@ -181,6 +217,7 @@
             // 
             // textBoxKeyPair
             // 
+            this.textBoxKeyPair.BackColor = System.Drawing.Color.White;
             this.textBoxKeyPair.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxKeyPair.Location = new System.Drawing.Point(95, 95);
             this.textBoxKeyPair.Name = "textBoxKeyPair";
@@ -190,6 +227,7 @@
             // 
             // textBoxPublicDns
             // 
+            this.textBoxPublicDns.BackColor = System.Drawing.Color.White;
             this.textBoxPublicDns.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxPublicDns.Location = new System.Drawing.Point(95, 114);
             this.textBoxPublicDns.Name = "textBoxPublicDns";
@@ -199,6 +237,7 @@
             // 
             // textBoxPrivateDns
             // 
+            this.textBoxPrivateDns.BackColor = System.Drawing.Color.White;
             this.textBoxPrivateDns.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxPrivateDns.Location = new System.Drawing.Point(95, 133);
             this.textBoxPrivateDns.Name = "textBoxPrivateDns";
@@ -208,6 +247,7 @@
             // 
             // textBoxPrivateIp
             // 
+            this.textBoxPrivateIp.BackColor = System.Drawing.Color.White;
             this.textBoxPrivateIp.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxPrivateIp.Location = new System.Drawing.Point(95, 171);
             this.textBoxPrivateIp.Name = "textBoxPrivateIp";
@@ -226,9 +266,11 @@
             // 
             // textBoxElasticIp
             // 
+            this.textBoxElasticIp.BackColor = System.Drawing.Color.White;
             this.textBoxElasticIp.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxElasticIp.Location = new System.Drawing.Point(95, 152);
             this.textBoxElasticIp.Name = "textBoxElasticIp";
+            this.textBoxElasticIp.ReadOnly = true;
             this.textBoxElasticIp.Size = new System.Drawing.Size(107, 13);
             this.textBoxElasticIp.TabIndex = 17;
             // 
@@ -240,7 +282,6 @@
             this.buttonStart.TabIndex = 21;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
-            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
             // buttonStop
             // 
@@ -287,37 +328,18 @@
             this.buttonFileBrowser.Text = "File browser";
             this.buttonFileBrowser.UseVisualStyleBackColor = true;
             // 
-            // buttonInstallApp
-            // 
-            this.buttonInstallApp.Location = new System.Drawing.Point(501, 218);
-            this.buttonInstallApp.Name = "buttonInstallApp";
-            this.buttonInstallApp.Size = new System.Drawing.Size(91, 23);
-            this.buttonInstallApp.TabIndex = 27;
-            this.buttonInstallApp.Text = "Install app.";
-            this.buttonInstallApp.UseVisualStyleBackColor = true;
-            // 
             // buttonRunScript
             // 
-            this.buttonRunScript.Location = new System.Drawing.Point(501, 247);
+            this.buttonRunScript.Location = new System.Drawing.Point(501, 267);
             this.buttonRunScript.Name = "buttonRunScript";
             this.buttonRunScript.Size = new System.Drawing.Size(91, 23);
             this.buttonRunScript.TabIndex = 28;
             this.buttonRunScript.Text = "Run script";
             this.buttonRunScript.UseVisualStyleBackColor = true;
             // 
-            // buttonMonitor
-            // 
-            this.buttonMonitor.Location = new System.Drawing.Point(501, 288);
-            this.buttonMonitor.Name = "buttonMonitor";
-            this.buttonMonitor.Size = new System.Drawing.Size(91, 23);
-            this.buttonMonitor.TabIndex = 29;
-            this.buttonMonitor.Text = "Monitor";
-            this.buttonMonitor.UseVisualStyleBackColor = true;
-            this.buttonMonitor.Click += new System.EventHandler(this.buttonMonitor_Click);
-            // 
             // buttonConsoleOutput
             // 
-            this.buttonConsoleOutput.Location = new System.Drawing.Point(501, 317);
+            this.buttonConsoleOutput.Location = new System.Drawing.Point(501, 306);
             this.buttonConsoleOutput.Name = "buttonConsoleOutput";
             this.buttonConsoleOutput.Size = new System.Drawing.Size(91, 23);
             this.buttonConsoleOutput.TabIndex = 30;
@@ -343,15 +365,254 @@
             this.buttonWWWip.Text = "www";
             this.buttonWWWip.UseVisualStyleBackColor = true;
             // 
+            // buttonMysqlAdmin
+            // 
+            this.buttonMysqlAdmin.Location = new System.Drawing.Point(501, 200);
+            this.buttonMysqlAdmin.Name = "buttonMysqlAdmin";
+            this.buttonMysqlAdmin.Size = new System.Drawing.Size(91, 23);
+            this.buttonMysqlAdmin.TabIndex = 26;
+            this.buttonMysqlAdmin.Text = "Mysql Admin";
+            this.buttonMysqlAdmin.UseVisualStyleBackColor = true;
+            // 
+            // buttonMysqlBrowser
+            // 
+            this.buttonMysqlBrowser.Location = new System.Drawing.Point(501, 229);
+            this.buttonMysqlBrowser.Name = "buttonMysqlBrowser";
+            this.buttonMysqlBrowser.Size = new System.Drawing.Size(91, 23);
+            this.buttonMysqlBrowser.TabIndex = 26;
+            this.buttonMysqlBrowser.Text = "MySQL Browser";
+            this.buttonMysqlBrowser.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(43, 190);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(46, 26);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Installed\r\napps";
+            // 
+            // listViewApps
+            // 
+            this.listViewApps.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.listViewApps.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4});
+            this.listViewApps.FullRowSelect = true;
+            this.listViewApps.HideSelection = false;
+            this.listViewApps.Location = new System.Drawing.Point(95, 190);
+            this.listViewApps.Name = "listViewApps";
+            this.listViewApps.Size = new System.Drawing.Size(400, 110);
+            this.listViewApps.TabIndex = 31;
+            this.listViewApps.UseCompatibleStateImageBehavior = false;
+            this.listViewApps.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Name";
+            this.columnHeader1.Width = 77;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Repo";
+            this.columnHeader2.Width = 138;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "URL";
+            this.columnHeader3.Width = 122;
+            // 
+            // buttonAppsNew
+            // 
+            this.buttonAppsNew.Location = new System.Drawing.Point(95, 306);
+            this.buttonAppsNew.Name = "buttonAppsNew";
+            this.buttonAppsNew.Size = new System.Drawing.Size(77, 23);
+            this.buttonAppsNew.TabIndex = 32;
+            this.buttonAppsNew.Text = "New app";
+            this.buttonAppsNew.UseVisualStyleBackColor = true;
+            // 
+            // buttonAppsUpdate
+            // 
+            this.buttonAppsUpdate.Location = new System.Drawing.Point(178, 306);
+            this.buttonAppsUpdate.Name = "buttonAppsUpdate";
+            this.buttonAppsUpdate.Size = new System.Drawing.Size(118, 23);
+            this.buttonAppsUpdate.TabIndex = 32;
+            this.buttonAppsUpdate.Text = "Update/pull selected";
+            this.buttonAppsUpdate.UseVisualStyleBackColor = true;
+            // 
+            // buttonAppsRebootApache
+            // 
+            this.buttonAppsRebootApache.Location = new System.Drawing.Point(302, 306);
+            this.buttonAppsRebootApache.Name = "buttonAppsRebootApache";
+            this.buttonAppsRebootApache.Size = new System.Drawing.Size(90, 23);
+            this.buttonAppsRebootApache.TabIndex = 32;
+            this.buttonAppsRebootApache.Text = "Reboot apache";
+            this.buttonAppsRebootApache.UseVisualStyleBackColor = true;
+            // 
+            // buttonAppsRefresh
+            // 
+            this.buttonAppsRefresh.Location = new System.Drawing.Point(398, 306);
+            this.buttonAppsRefresh.Name = "buttonAppsRefresh";
+            this.buttonAppsRefresh.Size = new System.Drawing.Size(55, 23);
+            this.buttonAppsRefresh.TabIndex = 32;
+            this.buttonAppsRefresh.Text = "Refresh";
+            this.buttonAppsRefresh.UseVisualStyleBackColor = true;
+            // 
+            // chart1
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            this.chart1.Location = new System.Drawing.Point(12, 351);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.Name = "Series1";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.Name = "Series2";
+            this.chart1.Series.Add(series1);
+            this.chart1.Series.Add(series2);
+            this.chart1.Size = new System.Drawing.Size(201, 100);
+            this.chart1.TabIndex = 33;
+            this.chart1.Text = "chart1";
+            // 
+            // chart2
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
+            this.chart2.Location = new System.Drawing.Point(219, 351);
+            this.chart2.Name = "chart2";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.Name = "Series1";
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.Name = "Series2";
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series5.Name = "Series3";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series6.Name = "Series4";
+            this.chart2.Series.Add(series3);
+            this.chart2.Series.Add(series4);
+            this.chart2.Series.Add(series5);
+            this.chart2.Series.Add(series6);
+            this.chart2.Size = new System.Drawing.Size(201, 100);
+            this.chart2.TabIndex = 33;
+            this.chart2.Text = "chart1";
+            // 
+            // chart3
+            // 
+            chartArea3.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea3);
+            this.chart3.Location = new System.Drawing.Point(426, 351);
+            this.chart3.Name = "chart3";
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series7.MarkerSize = 10;
+            series7.Name = "Series1";
+            this.chart3.Series.Add(series7);
+            this.chart3.Size = new System.Drawing.Size(166, 100);
+            this.chart3.TabIndex = 33;
+            this.chart3.Text = "chart1";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(12, 335);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(61, 13);
+            this.label10.TabIndex = 34;
+            this.label10.Text = "CPU usage";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(220, 335);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(76, 13);
+            this.label11.TabIndex = 34;
+            this.label11.Text = "Network traffic";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(423, 335);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(76, 13);
+            this.label12.TabIndex = 34;
+            this.label12.Text = "Storage usage";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "Hours",
+            "Days",
+            "Months"});
+            this.comboBox1.Location = new System.Drawing.Point(104, 457);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
+            this.comboBox1.TabIndex = 35;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(52, 457);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(46, 20);
+            this.textBox1.TabIndex = 36;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(12, 460);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(34, 13);
+            this.label13.TabIndex = 37;
+            this.label13.Text = "Since";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(231, 460);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(28, 13);
+            this.label14.TabIndex = 37;
+            this.label14.Text = "ago.";
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Type";
+            // 
             // PopupEc2Properties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(604, 382);
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(604, 482);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.chart3);
+            this.Controls.Add(this.chart2);
+            this.Controls.Add(this.chart1);
+            this.Controls.Add(this.buttonAppsRefresh);
+            this.Controls.Add(this.buttonAppsRebootApache);
+            this.Controls.Add(this.buttonAppsUpdate);
+            this.Controls.Add(this.buttonAppsNew);
+            this.Controls.Add(this.listViewApps);
             this.Controls.Add(this.buttonConsoleOutput);
-            this.Controls.Add(this.buttonMonitor);
             this.Controls.Add(this.buttonRunScript);
-            this.Controls.Add(this.buttonInstallApp);
+            this.Controls.Add(this.buttonMysqlBrowser);
+            this.Controls.Add(this.buttonMysqlAdmin);
             this.Controls.Add(this.buttonFileBrowser);
             this.Controls.Add(this.buttonTerminal);
             this.Controls.Add(this.buttonTerminate);
@@ -361,6 +622,7 @@
             this.Controls.Add(this.buttonWWWip);
             this.Controls.Add(this.buttonWWW);
             this.Controls.Add(this.buttonChangeName);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
@@ -384,6 +646,9 @@
             this.Name = "PopupEc2Properties";
             this.Text = "PopupEc2Properties";
             this.Load += new System.EventHandler(this.PopupEc2Properties_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -416,11 +681,31 @@
         private System.Windows.Forms.Button buttonTerminate;
         private System.Windows.Forms.Button buttonTerminal;
         private System.Windows.Forms.Button buttonFileBrowser;
-        private System.Windows.Forms.Button buttonInstallApp;
         private System.Windows.Forms.Button buttonRunScript;
-        private System.Windows.Forms.Button buttonMonitor;
         private System.Windows.Forms.Button buttonConsoleOutput;
         private System.Windows.Forms.Button buttonWWW;
         private System.Windows.Forms.Button buttonWWWip;
+        private System.Windows.Forms.Button buttonMysqlAdmin;
+        private System.Windows.Forms.Button buttonMysqlBrowser;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ListView listViewApps;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.Button buttonAppsNew;
+        private System.Windows.Forms.Button buttonAppsUpdate;
+        private System.Windows.Forms.Button buttonAppsRebootApache;
+        private System.Windows.Forms.Button buttonAppsRefresh;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
     }
 }

@@ -39,6 +39,20 @@ namespace ZAws
                 return ResponseData.VolumeId;
             }
         }
+        public override string Description
+        {
+            get
+            {
+                string s = "";
+                try
+                {
+                    s = "(" + myController.GetEc2(ResponseData.Attachment[0].InstanceId).Name + ")";
+                    s += "\n=> " + ResponseData.Attachment[0].Device;
+                }
+                catch { }
+                return s;
+            }
+        } 
 
         protected override bool DoUpdate(object responseData)
         {

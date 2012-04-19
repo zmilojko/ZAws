@@ -18,9 +18,12 @@ namespace ZAws.Console
         /// This should never be used - it is here only for the FOrms designer!
         /// </summary>
         public ZAwsPopupForm()
+            : base()
         {
         }
+
         public ZAwsPopupForm(ZAwsObject obj)
+            : this()
         {
             MyObj = obj;
             Debug.Assert(MyObj != null);

@@ -48,6 +48,21 @@ namespace ZAws
             }
         }
 
+        public override string Description
+        {
+            get
+            {
+                ZAwsEc2 ec2 = null;
+                try
+                {
+                    ec2 = myController.GetEc2(this.ResponseData.InstanceId);
+                }
+                catch { }
+                return ResponseData.LaunchSpecification.InstanceType + "\n$" + ResponseData.SpotPrice.Substring(0, 5) + (ec2 != null ?
+                    "\n=> " + ec2.Name : "");
+            }
+        } 
+
         
 
         protected override bool DoUpdate(object responseData)
