@@ -75,6 +75,7 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonAppsNew = new System.Windows.Forms.Button();
             this.buttonAppsUpdate = new System.Windows.Forms.Button();
             this.buttonAppsRebootApache = new System.Windows.Forms.Button();
@@ -89,7 +90,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.buttonAppWWW = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
@@ -408,6 +409,7 @@
             this.listViewApps.TabIndex = 31;
             this.listViewApps.UseCompatibleStateImageBehavior = false;
             this.listViewApps.View = System.Windows.Forms.View.Details;
+            this.listViewApps.SelectedIndexChanged += new System.EventHandler(this.listViewApps_SelectedIndexChanged);
             // 
             // columnHeader1
             // 
@@ -424,18 +426,24 @@
             this.columnHeader3.Text = "URL";
             this.columnHeader3.Width = 122;
             // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Type";
+            // 
             // buttonAppsNew
             // 
-            this.buttonAppsNew.Location = new System.Drawing.Point(95, 306);
+            this.buttonAppsNew.Location = new System.Drawing.Point(90, 306);
             this.buttonAppsNew.Name = "buttonAppsNew";
             this.buttonAppsNew.Size = new System.Drawing.Size(77, 23);
             this.buttonAppsNew.TabIndex = 32;
             this.buttonAppsNew.Text = "New app";
             this.buttonAppsNew.UseVisualStyleBackColor = true;
+            this.buttonAppsNew.Click += new System.EventHandler(this.buttonAppsNew_Click);
             // 
             // buttonAppsUpdate
             // 
-            this.buttonAppsUpdate.Location = new System.Drawing.Point(178, 306);
+            this.buttonAppsUpdate.Enabled = false;
+            this.buttonAppsUpdate.Location = new System.Drawing.Point(173, 306);
             this.buttonAppsUpdate.Name = "buttonAppsUpdate";
             this.buttonAppsUpdate.Size = new System.Drawing.Size(118, 23);
             this.buttonAppsUpdate.TabIndex = 32;
@@ -444,7 +452,7 @@
             // 
             // buttonAppsRebootApache
             // 
-            this.buttonAppsRebootApache.Location = new System.Drawing.Point(302, 306);
+            this.buttonAppsRebootApache.Location = new System.Drawing.Point(297, 306);
             this.buttonAppsRebootApache.Name = "buttonAppsRebootApache";
             this.buttonAppsRebootApache.Size = new System.Drawing.Size(90, 23);
             this.buttonAppsRebootApache.TabIndex = 32;
@@ -453,7 +461,7 @@
             // 
             // buttonAppsRefresh
             // 
-            this.buttonAppsRefresh.Location = new System.Drawing.Point(398, 306);
+            this.buttonAppsRefresh.Location = new System.Drawing.Point(393, 307);
             this.buttonAppsRefresh.Name = "buttonAppsRefresh";
             this.buttonAppsRefresh.Size = new System.Drawing.Size(55, 23);
             this.buttonAppsRefresh.TabIndex = 32;
@@ -584,9 +592,14 @@
             this.label14.TabIndex = 37;
             this.label14.Text = "ago.";
             // 
-            // columnHeader4
+            // buttonAppWWW
             // 
-            this.columnHeader4.Text = "Type";
+            this.buttonAppWWW.Location = new System.Drawing.Point(454, 307);
+            this.buttonAppWWW.Name = "buttonAppWWW";
+            this.buttonAppWWW.Size = new System.Drawing.Size(41, 22);
+            this.buttonAppWWW.TabIndex = 18;
+            this.buttonAppWWW.Text = "www";
+            this.buttonAppWWW.UseVisualStyleBackColor = true;
             // 
             // PopupEc2Properties
             // 
@@ -619,6 +632,7 @@
             this.Controls.Add(this.buttonReboot);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.buttonStart);
+            this.Controls.Add(this.buttonAppWWW);
             this.Controls.Add(this.buttonWWWip);
             this.Controls.Add(this.buttonWWW);
             this.Controls.Add(this.buttonChangeName);
@@ -707,5 +721,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.Button buttonAppWWW;
     }
 }

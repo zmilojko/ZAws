@@ -417,19 +417,32 @@ namespace ZAws
 
         public class Application
         {
-            internal Application(ZAwsEc2 server, string name, string url, string repo, ApplicationType type)
+            internal Application(ZAwsEc2 server, string name, string url, string repo, string reponame, ApplicationType type)
             {
                 Server = server;
                 Name = name;
                 URL = url;
                 Repo = repo;
+                RepoName = reponame;
                 AppType = type;
             }
             public readonly string Name;
             public readonly string URL;
             public readonly string Repo;
+            public readonly string RepoName;
             public readonly ApplicationType AppType;
             public readonly ZAwsEc2 Server;
+
+            public void Update()
+            {
+                Server.SshClient.SendLine("sudo su", true);
+                Program.Tracer.Trace(false, Server.SshClient.GetResponse().Replace("\n", "\nssh>"));
+                Server.SshClient.SendLine(string.Format("cd /var/{0}/{1}", this.AppType == ApplicationType.GENERIC ? "web_apps" : "rails_apps",
+                    this.Name), true);
+                Program.Tracer.Trace(false, Server.SshClient.GetResponse().Replace("\n", "\nssh>"));
+                Server.SshClient.SendLine(string.Format("git pull {0} master", this.RepoName), true);
+                Program.Tracer.Trace(false, Server.SshClient.GetResponse().Replace("\n", "\nssh>"));
+            }
         }
 
         List<Application> installedApplications = null;
@@ -474,11 +487,101 @@ namespace ZAws
                     Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
                     this.SshClient.SendLine("git remote -v", true);
                     Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
-                    string[] lsResp3 = resp.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-                    installedApplications.Add(new Application(this, name, lsResp2[5], lsResp3[3], t));                                  
+                    string gitrepo = "" ;
+                    string gitreponame = "";
+                    if (!resp.ToLower().Contains("Not a git repository".ToLower()))
+                    {
+                        gitreponame = resp.Split(new string[] { " ", "\n", "\r", "\t" }, StringSplitOptions.RemoveEmptyEntries)[3];
+                        gitrepo = resp.Split(new string[] { " ", "\n", "\r", "\t" }, StringSplitOptions.RemoveEmptyEntries)[4];
+                    }
+                    installedApplications.Add(new Application(this, name, lsResp2[5], gitrepo, gitreponame, t));
                 }
             }
             return installedApplications.ToArray();
+        }
+
+        public void RebootWebServer()
+        {
+            this.SshClient.SendLine("sudo service httpd restart", true);
+            string resp;
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+            if (resp.Contains("Starting httpd") && resp.Substring(resp.IndexOf("Starting httpd") + 14).Contains("OK"))
+            {
+                return;
+            }
+            //Lets try to solve this problem: it might be that 
+            Program.Tracer.TraceLine(false, "Problem restarting Apache. Trying to kill the process brutaly and start it.");
+            this.SshClient.SendLine("sudo netstat -tulpn | grep 80", true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+            var resp2 = resp.Split(new char[] { ' ', '/' }, StringSplitOptions.RemoveEmptyEntries);
+            for(int i=0; i< resp2.Length;i++)
+            {
+                if (resp2[i] == "httpd" && i>0)
+                {
+                    this.SshClient.SendLine("sudo kill " + resp2[i-1], true);
+                    Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+                    this.SshClient.SendLine("sudo service httpd start", true);
+                    Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+                    if (resp.Contains("Starting httpd") && resp.Substring(resp.IndexOf("Starting httpd") + 14).Contains("OK"))
+                    {
+                        return;
+                    }
+                    break;
+                }
+            }
+            throw new Exception("Not received OK response from server.");
+        }
+
+        internal void InstallApp(string name, string url, string repo_location, ApplicationType applicationType, bool createUrlDnsEntry, bool defaultApp)
+        {
+            string resp;
+            this.SshClient.SendLine("sudo su", true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            //Step 1: Craete a folder and git pull everything in it
+            this.SshClient.SendLine("cd /var/" + (applicationType == ApplicationType.GENERIC ? "web_apps" : "rails_apps"), true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            this.SshClient.SendLine("mkdir " + name, true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+            this.SshClient.SendLine("cd " + name, true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            this.SshClient.SendLine("git init", true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            string cmd = string.Format("git remote add origin {0}", repo_location);
+            this.SshClient.SendLine(cmd, true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            this.SshClient.SendLine("git pull origin master", true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            //Step 2: Execute README bash script            
+            this.SshClient.SendLine("bash STARTME", true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            //Step 3: Create virtual host
+            this.SshClient.SendLine("cd /etc/httpd/virtual_hosts/", true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            string config_text = string.Format(ZAws.Properties.Resources.ConfigText, name, url,
+                applicationType == ApplicationType.GENERIC ? "" : "/public", defaultApp ? "_" : "");
+            this.SshClient.SendLine(config_text, true);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            //Step 4: If needed, assign URl A record to this EC2
+            if (!string.IsNullOrWhiteSpace(url) && createUrlDnsEntry)
+            {
+                this.PointUrl(url);
+            }
+
+
+        }
+
+        private void PointUrl(string url)
+        {
+            throw new NotImplementedException();
         }
     }
 }

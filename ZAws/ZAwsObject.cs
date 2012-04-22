@@ -60,6 +60,7 @@ namespace ZAws
             TriggerObjectDeleted();
         }
 
+        public virtual string Id { get { return Name; } }
         public abstract string Name { get; }
         public virtual string Description
         {

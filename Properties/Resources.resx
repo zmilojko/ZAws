@@ -146,4 +146,15 @@ echo "&lt;VirtualHost *:80&gt;
 
 service httpd restart</value>
   </data>
+  <data name="ConfigText" xml:space="preserve">
+    <value>echo "&lt;VirtualHost *:80&gt;
+    ServerName {1}
+    DocumentRoot /var/rails_apps/{0}{2}
+    &lt;Directory /var/rails_apps/{0}{2}&gt;
+       AllowOverride all
+       Options -MultiViews
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+" &gt; /etc/httpd/virtual_hosts/{3}{0}.conf</value>
+  </data>
 </root>

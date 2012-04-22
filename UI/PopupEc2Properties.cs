@@ -36,10 +36,33 @@ namespace ZAws.Console
             buttonMysqlBrowser.Click += Do.HandleInZawsUi(buttonMysqlBrowser_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
 
             buttonAppsRefresh.Click += Do.HandleInZawsUi(buttonAppsRefresh_Click, "Apps info retrieved.", "Error while checking installed apps, reason: {0}");
+            buttonAppsUpdate.Click += Do.HandleInZawsUi(buttonAppsUpdate_Click, "Selected apps updated from repositories. NOTE: You might have to perform additional steps and/or restart the web server for changes to take effect.", "Error updating selected apps, reason: {0}");
+            buttonAppsRebootApache.Click += Do.HandleInZawsUi(buttonAppsRebootApache_Click, "Apache restarted.", "Problem restarting apache, reason: {0}");
 
             MyEC2.StatusChanged += new EventHandler(MyEC2_StatusChanged);
             MyEC2.ObjectDeleted += new EventHandler(MyEC2_ObjectDeleted);
             buttonChangeName.Enabled = false;
+        }
+
+        void buttonAppsRebootApache_Click(object sender, EventArgs e)
+        {
+            MyEC2.RebootWebServer();
+        }
+
+        void buttonAppsUpdate_Click(object sender, EventArgs e)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running && listViewApps.SelectedItems.Count > 0)
+            {
+                foreach (ListViewItem item in listViewApps.SelectedItems)
+                {
+                    ZAwsEc2.Application app = (ZAwsEc2.Application)item.Tag;
+                    if (!string.IsNullOrWhiteSpace(app.Repo))
+                    {
+                        app.Update();
+                        Program.TraceLine("Application {0} updated from repository {1} succesfully.", app.Name, app.Repo);
+                    }
+                }
+            }
         }
 
         void MyEC2_ObjectDeleted(object sender, EventArgs e)
@@ -90,7 +113,7 @@ namespace ZAws.Console
             buttonStop.Enabled = buttonReboot.Enabled = MyEC2.Status == ZAwsEc2.Ec2Status.Running;
             buttonTerminal.Enabled = buttonFileBrowser.Enabled =
                 buttonRunScript.Enabled = buttonAppsNew.Enabled = buttonAppsRebootApache.Enabled =
-                buttonAppsRefresh.Enabled = buttonAppsUpdate.Enabled = (MyEC2.Status == ZAwsEc2.Ec2Status.Running);
+                buttonAppsRefresh.Enabled = (MyEC2.Status == ZAwsEc2.Ec2Status.Running);
 
             //SettingInfo = false;
         }
@@ -160,7 +183,9 @@ namespace ZAws.Console
         {
             if (MyEC2.Status == ZAwsEc2.Ec2Status.Running)
             {
-                listViewApps.Items.Clear(); 
+                listViewApps.Items.Clear();
+                listViewApps.SelectedItems.Clear();
+                buttonAppsRefresh.Enabled = false;
                 foreach (ZAwsEc2.Application app in MyEC2.GetInstalledApps(force))
                 {
                     var i = listViewApps.Items.Add(new ListViewItem(app.Name));
@@ -229,6 +254,50 @@ namespace ZAws.Console
         private void buttonMonitor_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void listViewApps_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running && listViewApps.SelectedItems.Count > 0)
+            {
+                foreach (ListViewItem item in listViewApps.SelectedItems)
+                {
+                    ZAwsEc2.Application app = (ZAwsEc2.Application)item.Tag;
+                    if (!string.IsNullOrWhiteSpace(app.Repo))
+                    {
+                        buttonAppsUpdate.Enabled = true;
+                        return;
+                    }
+                }
+                buttonAppsUpdate.Enabled = false;
+            }
+            else
+            {
+                buttonAppsUpdate.Enabled = false;
+            }
+        }
+
+        private void buttonAppsNew_Click(object sender, EventArgs e)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running)
+            {
+                DlgNewApp dlg = new DlgNewApp();
+                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    try
+                    {
+                        MyEC2.InstallApp(dlg.textBoxGitApp.Text, dlg.textBoxGitAppUrl.Text, dlg.textBoxGitAppLocation.Text,
+                            dlg.comboBoxGitAppType.SelectedIndex == 0 ? ZAwsEc2.ApplicationType.RAILS_APP : ZAwsEc2.ApplicationType.GENERIC,
+                            dlg.checkBoxGitAppDnsRecord.Checked, dlg.checkBoxGitAppDefaultServerApp.Checked);
+                        RefreshApps(false);
+                        Program.TraceLine("Succesfuly installed app {0}. Note: you still need to restart the web server for the changes to take place.", dlg.textBoxGitApp.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Program.TraceLine("Error installing new app, reason: {0}.", ex);
+                    }
+                }
+            }
         }
     }
 }
