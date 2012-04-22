@@ -68,6 +68,7 @@ namespace ZAws
         protected override bool DoUpdate(object responseData)
         {
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.SpotInstanceRequest), "Wrong data passed to the object for update.");
+            /*
             if(!string.IsNullOrWhiteSpace(((Amazon.EC2.Model.SpotInstanceRequest)responseData).InstanceId)
                 &&(ResponseData == null
                         || ResponseData.InstanceId != ((Amazon.EC2.Model.SpotInstanceRequest)responseData).InstanceId))
@@ -75,10 +76,8 @@ namespace ZAws
                 myController.AssignInstanceToSpotRequest(((Amazon.EC2.Model.SpotInstanceRequest)responseData).SpotInstanceRequestId,
                      ((Amazon.EC2.Model.SpotInstanceRequest)responseData).InstanceId);
             }
+            */
             ResponseData = (Amazon.EC2.Model.SpotInstanceRequest)responseData;
-
-            
-
             return true;
         }
 

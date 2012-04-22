@@ -155,7 +155,8 @@ namespace ZAws
                     Amazon.EC2.Model.RequestSpotInstancesResponse resp2 = myController.ec2.RequestSpotInstances(req2);
 
                     NewInstanceId = resp2.RequestSpotInstancesResult.SpotInstanceRequest[0].SpotInstanceRequestId;
-                    myController.RememberNameForSpotInstance(NewInstanceId, Name);
+                    myController.myTaskQueue.AddTask(new ZAwsTaskNewSpotRequestHandling(this.myController,resp2.RequestSpotInstancesResult.SpotInstanceRequest[0].SpotInstanceRequestId, Name));
+                    //myController.RememberNameForSpotInstance(NewInstanceId, Name);
                 }
                 else
                 {

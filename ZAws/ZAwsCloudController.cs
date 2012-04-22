@@ -47,11 +47,14 @@ namespace ZAws
         internal AmazonS3 s3 { get; private set; }
         internal AmazonCloudWatch CloudWatch;
 
+        internal ZAwsTaskHandler myTaskQueue;
+
         public ZAwsEc2Controller()
         {
             ec2 = null;
             route53 = null;
             s3 = null;
+            myTaskQueue = new ZAwsTaskHandler(this);
         }
         public class ZAwsNewObjectEventArgs : EventArgs
         {
@@ -153,6 +156,8 @@ namespace ZAws
                 Debug.Assert(route53 != null);
                 Debug.Assert(s3 != null);
                 Debug.Assert(CloudWatch != null);
+
+                myTaskQueue.Close();
 
                 bool killedTheThread = false;
                 //Shut the thread
@@ -310,6 +315,7 @@ namespace ZAws
                         if (oldI.EqualsData(res))
                         {
                             oldI.Update(res);
+                            myTaskQueue.HandleNewObject(oldI);
                             found = true;
                             break;
                         }
@@ -323,6 +329,7 @@ namespace ZAws
                         {
                             NewObject(this, new ZAwsNewObjectEventArgs(NewObj));
                         }
+                        myTaskQueue.HandleNewObject(NewObj);
                     }
                 }
 
@@ -437,6 +444,7 @@ namespace ZAws
             runningApps.AddRange(NewInstalledApps);
         }
 
+        /*
         internal bool HandleNewEc2Instance(ZAwsEc2 newEc2)
         {
             Program.TraceLine("Check for post boot actions for EC2 {0}.", newEc2.Name);
@@ -543,7 +551,7 @@ namespace ZAws
                 }
             }
         }
-
+       
         class NameForSpotInstance
         {
             public string SpotInstanceRequestId;
@@ -588,5 +596,6 @@ namespace ZAws
                 }
             }
         }
+         * */
     }
 }

@@ -30,7 +30,7 @@ namespace ZAws
         {
             Update(res);
 
-            myController.HandleNewElasticIp(this);
+            //myController.HandleNewElasticIp(this);
         }
         Amazon.EC2.Model.Address ResponseData;
 

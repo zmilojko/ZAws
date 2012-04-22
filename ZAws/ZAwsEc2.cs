@@ -40,12 +40,14 @@ namespace ZAws
 
             Update(res);
 
+            /*
             Trace.WriteLine("Now will see to configure new applications.");
             ConfigureAppsWhenBootingComplete = myController.HandleNewEc2Instance(this) ? 3 : 0;
             Trace.WriteLine("ConfigureAppsWhenBootingComplete = " + ConfigureAppsWhenBootingComplete.ToString());
+             * */
         }
 
-        int ConfigureAppsWhenBootingComplete = 0;
+        //int ConfigureAppsWhenBootingComplete = 0;
 
         public override string Name
         {
@@ -61,6 +63,14 @@ namespace ZAws
                     }
                 }
                 return InstanceName;
+            }
+        }
+
+        public override string Id
+        {
+            get
+            {
+                return InstanceId;
             }
         }
 
@@ -107,16 +117,6 @@ namespace ZAws
         protected override bool DoUpdate(object responseData)
         {
             Debug.Assert(responseData.GetType() == typeof(Amazon.EC2.Model.Reservation), "Wrong data passed to the object for update.");
-
-            /*
-            //First time public DNS is received, configure apps
-            if (Reservation != null && string.IsNullOrWhiteSpace(InstanceId)
-                && !string.IsNullOrWhiteSpace(((Amazon.EC2.Model.Reservation)responseData).RunningInstance[0].InstanceId))
-            {
-                Trace.Wri
-                ConfigureAppsWhenBootingComplete = myController.HandleNewEc2Instance(this);
-            }
-            */
             Reservation = (Amazon.EC2.Model.Reservation)responseData;
             return true;
         }
@@ -318,6 +318,7 @@ namespace ZAws
                         ConsoleUpdate(this, new NewConceolOutputEventArgs(ConsoleOutput, LatestBootConsoleTimestamp));
                     }
                 }
+                /*
                 if (this.ConfigureAppsWhenBootingComplete > 0)
                 {
                     try
@@ -330,6 +331,7 @@ namespace ZAws
                         ConfigureAppsWhenBootingComplete--;
                     }
                 }
+                 * */
             }
         }
 
@@ -361,7 +363,7 @@ namespace ZAws
             Program.Tracer.Trace(false, SshClient.GetResponse().Replace("\n", "\nssh>"));
             this.SshClient.Close();
             Program.Tracer.TraceLine("\nssh>SSH DISCONNECTED.");
-            ConfigureAppsWhenBootingComplete = 0;
+            //ConfigureAppsWhenBootingComplete = 0;
         }
 
         public class NewConceolOutputEventArgs : EventArgs

@@ -67,6 +67,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.label8 = new System.Windows.Forms.Label();
             this.comboBoxPrice = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.tabPage3.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -223,6 +224,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.label13);
             this.tabPage3.Controls.Add(this.buttonRemoveAppFomList);
             this.tabPage3.Controls.Add(this.button2);
             this.tabPage3.Controls.Add(this.listView1);
@@ -247,6 +249,7 @@
             // 
             // buttonRemoveAppFomList
             // 
+            this.buttonRemoveAppFomList.Enabled = false;
             this.buttonRemoveAppFomList.Location = new System.Drawing.Point(350, 105);
             this.buttonRemoveAppFomList.Name = "buttonRemoveAppFomList";
             this.buttonRemoveAppFomList.Size = new System.Drawing.Size(75, 23);
@@ -272,6 +275,7 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3});
+            this.listView1.Enabled = false;
             this.listView1.FullRowSelect = true;
             this.listView1.Location = new System.Drawing.Point(51, 134);
             this.listView1.Name = "listView1";
@@ -298,6 +302,7 @@
             // comboBoxGitAppType
             // 
             this.comboBoxGitAppType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxGitAppType.Enabled = false;
             this.comboBoxGitAppType.FormattingEnabled = true;
             this.comboBoxGitAppType.Items.AddRange(new object[] {
             "Rails application",
@@ -319,6 +324,7 @@
             // checkBoxGitAppDefaultServerApp
             // 
             this.checkBoxGitAppDefaultServerApp.AutoSize = true;
+            this.checkBoxGitAppDefaultServerApp.Enabled = false;
             this.checkBoxGitAppDefaultServerApp.Location = new System.Drawing.Point(364, 84);
             this.checkBoxGitAppDefaultServerApp.Name = "checkBoxGitAppDefaultServerApp";
             this.checkBoxGitAppDefaultServerApp.Size = new System.Drawing.Size(164, 17);
@@ -331,6 +337,7 @@
             this.checkBoxGitAppDnsRecord.AutoSize = true;
             this.checkBoxGitAppDnsRecord.Checked = true;
             this.checkBoxGitAppDnsRecord.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxGitAppDnsRecord.Enabled = false;
             this.checkBoxGitAppDnsRecord.Location = new System.Drawing.Point(139, 84);
             this.checkBoxGitAppDnsRecord.Name = "checkBoxGitAppDnsRecord";
             this.checkBoxGitAppDnsRecord.Size = new System.Drawing.Size(219, 17);
@@ -377,6 +384,7 @@
             // textBoxGitAppUrl
             // 
             this.textBoxGitAppUrl.BackColor = System.Drawing.Color.LightCyan;
+            this.textBoxGitAppUrl.Enabled = false;
             this.textBoxGitAppUrl.Location = new System.Drawing.Point(139, 58);
             this.textBoxGitAppUrl.Name = "textBoxGitAppUrl";
             this.textBoxGitAppUrl.Size = new System.Drawing.Size(405, 20);
@@ -387,6 +395,7 @@
             // textBoxGitApp
             // 
             this.textBoxGitApp.BackColor = System.Drawing.Color.LightCyan;
+            this.textBoxGitApp.Enabled = false;
             this.textBoxGitApp.Location = new System.Drawing.Point(139, 32);
             this.textBoxGitApp.Name = "textBoxGitApp";
             this.textBoxGitApp.Size = new System.Drawing.Size(405, 20);
@@ -397,6 +406,7 @@
             // textBoxGitAppLocation
             // 
             this.textBoxGitAppLocation.BackColor = System.Drawing.Color.LightCyan;
+            this.textBoxGitAppLocation.Enabled = false;
             this.textBoxGitAppLocation.Location = new System.Drawing.Point(139, 6);
             this.textBoxGitAppLocation.Name = "textBoxGitAppLocation";
             this.textBoxGitAppLocation.Size = new System.Drawing.Size(405, 20);
@@ -441,6 +451,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Enabled = false;
             this.tabControl1.Location = new System.Drawing.Point(12, 120);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -464,6 +475,17 @@
             this.comboBoxPrice.Name = "comboBoxPrice";
             this.comboBoxPrice.Size = new System.Drawing.Size(198, 21);
             this.comboBoxPrice.TabIndex = 15;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.ForeColor = System.Drawing.Color.DarkRed;
+            this.label13.Location = new System.Drawing.Point(13, 177);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(491, 31);
+            this.label13.TabIndex = 20;
+            this.label13.Text = "THIS IS TEMPORARILY DISABLED!";
             // 
             // DlgLaunchNewInstance
             // 
@@ -544,5 +566,6 @@
         private System.Windows.Forms.Button buttonRemoveAppFomList;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox comboBoxPrice;
+        private System.Windows.Forms.Label label13;
     }
 }

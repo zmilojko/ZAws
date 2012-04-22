@@ -73,7 +73,7 @@ namespace ZAws.Console
             Tracer.TraceLine(line, ex, line_parameters);
         }
 
-        static ZAws.Console.MainView theMainView;
+        static MainView theMainView;
 
         [STAThread]
         public static void Main(string[] args)

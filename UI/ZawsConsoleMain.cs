@@ -148,8 +148,47 @@ namespace ZAws.Console
             awsListView_SelectedIndexChanged(sender, e);
         }
 
+        class ItemsAndBounds
+        {
+            public ZAwsObject obj;
+            public Rectangle Bounds;
+        }
+        delegate ItemsAndBounds[] MyCurrentObjectsInListDelegate();
+
+        ItemsAndBounds[] MyCurrentObjectsInList()
+        {
+            if (this.InvokeRequired)
+            {
+                return (ItemsAndBounds[])this.Invoke(new MyCurrentObjectsInListDelegate(this.MyCurrentObjectsInList));
+            }
+
+            List<ItemsAndBounds> list = new List<ItemsAndBounds>();
+            foreach (ListViewItem item in this.awsListView.Items)
+            {
+                list.Add(new ItemsAndBounds()
+                                {
+                                    obj = (ZAwsObject)item.Tag,
+                                    Bounds = item.Bounds
+                                });
+            }
+            return list.ToArray();
+        }
+
         void ZAwsObject_StatusChanged(object sender, EventArgs e)
         {
+            if (sender.GetType().IsSubclassOf(typeof(ZAwsObject)))
+            {
+                foreach (var item in MyCurrentObjectsInList())
+                {
+                    if (item.obj.Id == ((ZAwsObject)sender).Id)
+                    {
+                        awsListView.Invalidate(item.Bounds);
+                        awsListView_SelectedIndexChanged(sender, e);
+                        return;
+                    }
+                }
+            }
+
             awsListView.Invalidate();
             awsListView_SelectedIndexChanged(sender, e);
         }
