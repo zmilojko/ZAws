@@ -314,7 +314,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(567, 600);
             this.Name = "MainView";
-            this.Text = "Z Cloud Console";
+            this.Text = "ZBOOM Cloud Console";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainView_FormClosed);
             this.Load += new System.EventHandler(this.MainView_Load);
             this.Resize += new System.EventHandler(this.MainView_Resize);

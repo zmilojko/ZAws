@@ -34,10 +34,6 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PopupEc2Properties));
             this.textBoxName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -81,19 +77,16 @@
             this.buttonAppsRebootApache = new System.Windows.Forms.Button();
             this.buttonAppsRefresh = new System.Windows.Forms.Button();
             this.chartCPU = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartNet = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartDisk = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
+            this.labelChart1 = new System.Windows.Forms.Label();
+            this.labelChart2 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.buttonAppWWW = new System.Windows.Forms.Button();
+            this.chartNet = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.chartCPU)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartNet)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartDisk)).BeginInit();
             this.SuspendLayout();
             // 
             // textBoxName
@@ -470,6 +463,9 @@
             // 
             // chartCPU
             // 
+            chartArea1.AxisX.LabelAutoFitStyle = ((System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles)((System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep30 | System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.WordWrap)));
+            chartArea1.AxisX.LabelStyle.Angle = 30;
+            chartArea1.AxisX.LabelStyle.Format = "HH:mm";
             chartArea1.AxisX.MajorGrid.Enabled = false;
             chartArea1.AxisY.Maximum = 100D;
             chartArea1.AxisY.Minimum = 0D;
@@ -486,77 +482,27 @@
             series2.Name = "Series2";
             this.chartCPU.Series.Add(series1);
             this.chartCPU.Series.Add(series2);
-            this.chartCPU.Size = new System.Drawing.Size(201, 100);
+            this.chartCPU.Size = new System.Drawing.Size(284, 122);
             this.chartCPU.TabIndex = 33;
             this.chartCPU.Text = "chart1";
             // 
-            // chartNet
+            // labelChart1
             // 
-            chartArea2.Name = "ChartArea1";
-            this.chartNet.ChartAreas.Add(chartArea2);
-            this.chartNet.Location = new System.Drawing.Point(219, 351);
-            this.chartNet.Name = "chartNet";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series3.Name = "Series1";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Name = "Series2";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series5.Name = "Series3";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series6.Name = "Series4";
-            this.chartNet.Series.Add(series3);
-            this.chartNet.Series.Add(series4);
-            this.chartNet.Series.Add(series5);
-            this.chartNet.Series.Add(series6);
-            this.chartNet.Size = new System.Drawing.Size(201, 100);
-            this.chartNet.TabIndex = 33;
-            this.chartNet.Text = "chart1";
+            this.labelChart1.AutoSize = true;
+            this.labelChart1.Location = new System.Drawing.Point(12, 335);
+            this.labelChart1.Name = "labelChart1";
+            this.labelChart1.Size = new System.Drawing.Size(78, 13);
+            this.labelChart1.TabIndex = 34;
+            this.labelChart1.Text = "CPU usage (%)";
             // 
-            // chartDisk
+            // labelChart2
             // 
-            chartArea3.Name = "ChartArea1";
-            this.chartDisk.ChartAreas.Add(chartArea3);
-            this.chartDisk.Location = new System.Drawing.Point(426, 351);
-            this.chartDisk.Name = "chartDisk";
-            series7.ChartArea = "ChartArea1";
-            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series7.MarkerSize = 10;
-            series7.Name = "Series1";
-            this.chartDisk.Series.Add(series7);
-            this.chartDisk.Size = new System.Drawing.Size(166, 100);
-            this.chartDisk.TabIndex = 33;
-            this.chartDisk.Text = "chart1";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(12, 335);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(61, 13);
-            this.label10.TabIndex = 34;
-            this.label10.Text = "CPU usage";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(220, 335);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(76, 13);
-            this.label11.TabIndex = 34;
-            this.label11.Text = "Network traffic";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(423, 335);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(76, 13);
-            this.label12.TabIndex = 34;
-            this.label12.Text = "Storage usage";
+            this.labelChart2.AutoSize = true;
+            this.labelChart2.Location = new System.Drawing.Point(299, 335);
+            this.labelChart2.Name = "labelChart2";
+            this.labelChart2.Size = new System.Drawing.Size(145, 13);
+            this.labelChart2.TabIndex = 34;
+            this.labelChart2.Text = "Network traffic (KB per 5 min)";
             // 
             // comboBox1
             // 
@@ -570,6 +516,7 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 35;
+            this.comboBox1.Visible = false;
             // 
             // textBox1
             // 
@@ -577,6 +524,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(46, 20);
             this.textBox1.TabIndex = 36;
+            this.textBox1.Visible = false;
             // 
             // label13
             // 
@@ -586,6 +534,7 @@
             this.label13.Size = new System.Drawing.Size(34, 13);
             this.label13.TabIndex = 37;
             this.label13.Text = "Since";
+            this.label13.Visible = false;
             // 
             // label14
             // 
@@ -595,6 +544,7 @@
             this.label14.Size = new System.Drawing.Size(28, 13);
             this.label14.TabIndex = 37;
             this.label14.Text = "ago.";
+            this.label14.Visible = false;
             // 
             // buttonAppWWW
             // 
@@ -605,21 +555,40 @@
             this.buttonAppWWW.Text = "www";
             this.buttonAppWWW.UseVisualStyleBackColor = true;
             // 
+            // chartNet
+            // 
+            chartArea2.AxisX.MajorGrid.Enabled = false;
+            chartArea2.AxisY.Minimum = 0D;
+            chartArea2.Name = "ChartArea1";
+            this.chartNet.ChartAreas.Add(chartArea2);
+            this.chartNet.Location = new System.Drawing.Point(302, 351);
+            this.chartNet.Name = "chartNet";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series3.Name = "Series1";
+            series3.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series4.Name = "Series2";
+            this.chartNet.Series.Add(series3);
+            this.chartNet.Series.Add(series4);
+            this.chartNet.Size = new System.Drawing.Size(290, 122);
+            this.chartNet.TabIndex = 38;
+            this.chartNet.Text = "chart1";
+            // 
             // PopupEc2Properties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(604, 482);
+            this.Controls.Add(this.chartNet);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.label12);
-            this.Controls.Add(this.label11);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.chartDisk);
-            this.Controls.Add(this.chartNet);
+            this.Controls.Add(this.labelChart2);
+            this.Controls.Add(this.labelChart1);
             this.Controls.Add(this.chartCPU);
             this.Controls.Add(this.buttonAppsRefresh);
             this.Controls.Add(this.buttonAppsRebootApache);
@@ -666,7 +635,6 @@
             this.Load += new System.EventHandler(this.PopupEc2Properties_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chartCPU)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartNet)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartDisk)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -715,16 +683,14 @@
         private System.Windows.Forms.Button buttonAppsRebootApache;
         private System.Windows.Forms.Button buttonAppsRefresh;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartCPU;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chartNet;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chartDisk;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label labelChart1;
+        private System.Windows.Forms.Label labelChart2;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.Button buttonAppWWW;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartNet;
     }
 }

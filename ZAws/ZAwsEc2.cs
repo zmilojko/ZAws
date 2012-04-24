@@ -237,17 +237,21 @@ namespace ZAws
 
         public class Dimension
         {
-            public string Name;
-            public DataSample[] Values;
-            public string unit;
+            public DataSample[] Values = null;
         }
-        public Dimension CPUUtiliationMax = new Dimension()
-        {
-            
-            Name = "CPU Utilization Max",
-            Values = null,
-            unit = "%"
-        };
+
+        /// <summary>
+        /// Unit is %.
+        /// </summary>
+        public Dimension StatisticCPUUtiliationMax = new Dimension();
+        /// <summary>
+        /// Unit is %.
+        /// </summary>
+        public Dimension StatisticCPUUtiliationAvg = new Dimension();
+        /// <summary>
+        /// Unit is Kbps.
+        /// </summary>
+        public Dimension StatisticNetworkOut = new Dimension();
 
         DateTime timeSpanRequired = DateTime.Now - TimeSpan.FromDays(1);
 
@@ -292,14 +296,20 @@ namespace ZAws
                 if (resp2.GetMetricStatisticsResult.Datapoints.Count > 0)
                 {
 
-                    CPUUtiliationMax.Values = new DataSample[resp2.GetMetricStatisticsResult.Datapoints.Count];
+                    StatisticCPUUtiliationMax.Values = new DataSample[resp2.GetMetricStatisticsResult.Datapoints.Count];
+                    StatisticCPUUtiliationAvg.Values = new DataSample[resp2.GetMetricStatisticsResult.Datapoints.Count];
                     for (int i = 0; i < resp2.GetMetricStatisticsResult.Datapoints.Count; i++)
                     {
-                        CPUUtiliationMax.Values[i] = new DataSample()
-                            {
-                                Value = (decimal)resp2.GetMetricStatisticsResult.Datapoints[i].Maximum,
-                                Time = resp2.GetMetricStatisticsResult.Datapoints[i].Timestamp
-                            };
+                        StatisticCPUUtiliationMax.Values[i] = new DataSample()
+                        {
+                            Value = (decimal)resp2.GetMetricStatisticsResult.Datapoints[i].Maximum,
+                            Time = resp2.GetMetricStatisticsResult.Datapoints[i].Timestamp
+                        }; 
+                        StatisticCPUUtiliationAvg.Values[i] = new DataSample()
+                        {
+                            Value = (decimal)resp2.GetMetricStatisticsResult.Datapoints[i].Average,
+                            Time = resp2.GetMetricStatisticsResult.Datapoints[i].Timestamp
+                        };
                     }
                     
 
@@ -325,14 +335,24 @@ namespace ZAws
                                                                                                 .WithName("InstanceId")
                                                                                                 .WithValue(this.InstanceId))
 
-                                                                    .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
+                                                                    .WithStartTime(TimeSpanRequired.ToUniversalTime())
                                                                     .WithEndTime(DateTime.Now.ToUniversalTime())
-                                                                    .WithPeriod(300)
+                                                                    .WithPeriod(period)
                                                                     .WithMetricName("NetworkOut")
                                                                     .WithUnit("Bytes")
                                                                     .WithStatistics("Sum"));
                 if (resp3.GetMetricStatisticsResult.Datapoints.Count > 0)
                 {
+                    StatisticNetworkOut.Values = new DataSample[resp3.GetMetricStatisticsResult.Datapoints.Count];
+                    for (int i = 0; i < resp3.GetMetricStatisticsResult.Datapoints.Count; i++)
+                    {
+                        StatisticNetworkOut.Values[i] = new DataSample()
+                        {
+                            Value = (decimal)resp3.GetMetricStatisticsResult.Datapoints[i].Sum / 1000,
+                            Time = resp3.GetMetricStatisticsResult.Datapoints[i].Timestamp
+                        };
+                    }
+
                     int NetworkOutRecent5MinTemp = (int)resp3.GetMetricStatisticsResult.Datapoints[resp3.GetMetricStatisticsResult.Datapoints.Count - 1].Sum;
                     if (NetworkOutRecent5MinTemp != NetworkOutRecent5Min)
                     {
@@ -347,6 +367,8 @@ namespace ZAws
                     this.TriggerStatusChanged();
                 }
             }
+
+
             //check terminal
 
 

@@ -115,16 +115,39 @@ namespace ZAws.Console
                 buttonRunScript.Enabled = buttonAppsNew.Enabled = buttonAppsRebootApache.Enabled =
                 buttonAppsRefresh.Enabled = (MyEC2.Status == ZAwsEc2.Ec2Status.Running);
 
-            chartCPU.Series[0].Points.Clear();
-            chartCPU.ChartAreas[0].AxisX.LabelStyle.Format = "HH:mm";
-            chartCPU.ChartAreas[0].AxisX.LabelAutoFitStyle = System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep30;
-            chartCPU.ChartAreas[0].AxisX.IsLabelAutoFit = true;
-            if (MyEC2.CPUUtiliationMax != null)
+            try
             {
-                foreach (var point in MyEC2.CPUUtiliationMax.Values.OrderBy(new Func<ZAwsEc2.DataSample, DateTime>(myExtractor)))
-                {
-                    chartCPU.Series[0].Points.AddXY(point.Time, point.Value);
-                }
+                chartCPU.Series[0].Points.Clear();
+                chartCPU.Series[1].Points.Clear();
+                chartNet.Series[0].Points.Clear();
+
+                chartCPU.ChartAreas[0].AxisX.LabelStyle.Format = "HH:mm";
+                chartCPU.ChartAreas[0].AxisX.LabelAutoFitStyle = System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep30;
+                chartCPU.ChartAreas[0].AxisX.IsLabelAutoFit = true;
+                chartNet.ChartAreas[0].AxisX.LabelStyle.Format = "HH:mm";
+                chartNet.ChartAreas[0].AxisX.LabelAutoFitStyle = System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep30;
+                chartNet.ChartAreas[0].AxisX.IsLabelAutoFit = true;
+                    foreach (var point in MyEC2.StatisticCPUUtiliationMax.Values.OrderBy(new Func<ZAwsEc2.DataSample, DateTime>(myExtractor)))
+                    {
+                        chartCPU.Series[0].Points.AddXY(point.Time, point.Value);
+                    }
+                    foreach (var point in MyEC2.StatisticCPUUtiliationAvg.Values.OrderBy(new Func<ZAwsEc2.DataSample, DateTime>(myExtractor)))
+                    {
+                        chartCPU.Series[1].Points.AddXY(point.Time, point.Value);
+                    }
+                    foreach (var point in MyEC2.StatisticNetworkOut.Values.OrderBy(new Func<ZAwsEc2.DataSample, DateTime>(myExtractor)))
+                    {
+                        chartNet.Series[0].Points.AddXY(point.Time, point.Value);
+                    }
+                    chartNet.Visible = true;
+                    chartCPU.Visible = true;
+                    labelChart1.Visible = labelChart2.Visible = true;
+            }
+            catch
+            {
+                chartNet.Visible = 
+                chartCPU.Visible = 
+                labelChart1.Visible = labelChart2.Visible = false;
             }
             //SettingInfo = false;
         }
