@@ -115,9 +115,23 @@ namespace ZAws.Console
                 buttonRunScript.Enabled = buttonAppsNew.Enabled = buttonAppsRebootApache.Enabled =
                 buttonAppsRefresh.Enabled = (MyEC2.Status == ZAwsEc2.Ec2Status.Running);
 
+            chartCPU.Series[0].Points.Clear();
+            chartCPU.ChartAreas[0].AxisX.LabelStyle.Format = "HH:mm";
+            chartCPU.ChartAreas[0].AxisX.LabelAutoFitStyle = System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep30;
+            chartCPU.ChartAreas[0].AxisX.IsLabelAutoFit = true;
+            if (MyEC2.CPUUtiliationMax != null)
+            {
+                foreach (var point in MyEC2.CPUUtiliationMax.Values.OrderBy(new Func<ZAwsEc2.DataSample, DateTime>(myExtractor)))
+                {
+                    chartCPU.Series[0].Points.AddXY(point.Time, point.Value);
+                }
+            }
             //SettingInfo = false;
         }
-
+        DateTime myExtractor(ZAwsEc2.DataSample arg)
+        {
+            return arg.Time;
+        }
         private void PopupEc2Properties_Load(object sender, EventArgs e)
         {
             RefreshInfo();

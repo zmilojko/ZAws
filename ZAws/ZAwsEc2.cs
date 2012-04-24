@@ -23,6 +23,7 @@ using Amazon.EC2.Model;
 using Amazon.CloudWatch.Model;
 using ZAws.Console;
 using System.Threading;
+using Amazon.Route53.Model;
 
 namespace ZAws
 {
@@ -228,6 +229,42 @@ namespace ZAws
             }
         }
 
+        public class DataSample
+        {
+            public DateTime Time;
+            public decimal Value;
+        }
+
+        public class Dimension
+        {
+            public string Name;
+            public DataSample[] Values;
+            public string unit;
+        }
+        public Dimension CPUUtiliationMax = new Dimension()
+        {
+            
+            Name = "CPU Utilization Max",
+            Values = null,
+            unit = "%"
+        };
+
+        DateTime timeSpanRequired = DateTime.Now - TimeSpan.FromDays(1);
+
+        /// <summary>
+        /// Indicates the first timestamp required.
+        /// </summary>
+        public DateTime TimeSpanRequired
+        {
+            set
+            {
+                timeSpanRequired = value;
+            }
+            get
+            {
+                return timeSpanRequired;
+            }
+        }
 
         internal void UpdateInfo()
         {
@@ -235,23 +272,36 @@ namespace ZAws
 
             if (this.Status == Ec2Status.Running)
             {
+                //this will give us 5 minute interval on 1 day 
+                int period = Math.Min((int)((DateTime.Now - TimeSpanRequired).TotalSeconds / 288), 300);
 
                 var resp2 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
                                                                     .WithNamespace("AWS/EC2")
 
-                                                                    .WithDimensions(new Dimension()
+                                                                    .WithDimensions(new Amazon.CloudWatch.Model.Dimension()
                                                                                                 .WithName("InstanceId")
                                                                                                 .WithValue(this.InstanceId))
 
-                                                                    .WithStartTime((DateTime.Now - TimeSpan.FromHours(4)).ToUniversalTime())
+                                                                    .WithStartTime(TimeSpanRequired.ToUniversalTime())
                                                                     .WithEndTime(DateTime.Now.ToUniversalTime())
-                                                                    .WithPeriod(300)
+                                                                    .WithPeriod(period)
                                                                     .WithMetricName("CPUUtilization")
                                                                     .WithUnit("Percent")
                                                                     .WithStatistics("Average", "Maximum"));
 
                 if (resp2.GetMetricStatisticsResult.Datapoints.Count > 0)
                 {
+
+                    CPUUtiliationMax.Values = new DataSample[resp2.GetMetricStatisticsResult.Datapoints.Count];
+                    for (int i = 0; i < resp2.GetMetricStatisticsResult.Datapoints.Count; i++)
+                    {
+                        CPUUtiliationMax.Values[i] = new DataSample()
+                            {
+                                Value = (decimal)resp2.GetMetricStatisticsResult.Datapoints[i].Maximum,
+                                Time = resp2.GetMetricStatisticsResult.Datapoints[i].Timestamp
+                            };
+                    }
+                    
 
                     int CPUUtilizationTemp = (int)resp2.GetMetricStatisticsResult.Datapoints[resp2.GetMetricStatisticsResult.Datapoints.Count - 1].Maximum;
                     if (CPUUtilizationTemp != CPUUtilizationMax)
@@ -271,7 +321,7 @@ namespace ZAws
                 var resp3 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
                                                                     .WithNamespace("AWS/EC2")
 
-                                                                    .WithDimensions(new Dimension()
+                                                                    .WithDimensions(new Amazon.CloudWatch.Model.Dimension()
                                                                                                 .WithName("InstanceId")
                                                                                                 .WithValue(this.InstanceId))
 
@@ -581,9 +631,63 @@ namespace ZAws
 
         }
 
-        private void PointUrl(string url)
+        public ZAwsElasticIp AssociatedIP
         {
-            throw new NotImplementedException();
+            get
+            {
+                foreach (var ip in myController.CurrentElasticIps)
+                {
+                    if (ip.Associated && ip.AssociatedEc2.Id == Id)
+                    {
+                        return ip;
+                    }
+                }
+                return null;
+            }
+        }
+
+        public bool AssociateIp()
+        {
+            if (AssociatedIP != null)
+            {
+                return true;
+            }
+            foreach (var ip in myController.CurrentElasticIps)
+            {
+                if (!ip.Associated)
+                {
+                    ip.Associate(this);
+                    return true;
+                }
+            }
+            myController.AllocateIp();
+            myController.myTaskQueue.AddTask(new ZAwsTaskAssociateNewIpToEc2(this));
+            return false;
+        }
+
+        public void PointUrl(string url)
+        {
+            if (!AssociateIp())
+            {
+                myController.myTaskQueue.AddTask(new ZAwsTaskPointARecordToEc2(this, url));
+                return;
+            }
+            Program.TraceLine(">>>Searchign for a hosted zone to set following URL: {0}", url);
+            foreach (var zone in myController.CurrentHostedZones)
+            {
+                //Name of the hosted zone must match the ending of the app URL. 
+                if (url.TrimEnd('.').IndexOf(zone.Name.TrimEnd('.')) == url.TrimEnd('.').Length - zone.Name.TrimEnd('.').Length)
+                {
+                    Program.TraceLine(">>>Adding following record: {0} to hosted zone {1}", url, zone.Name);
+                    //Now add the record
+                    zone.AddRecord(new Amazon.Route53.Model.ResourceRecordSet()
+                                                        .WithName(url)
+                                                        .WithType("A")
+                                                        .WithTTL(800)
+                                                        .WithResourceRecords(new ResourceRecord()
+                                                                                    .WithValue(AssociatedIP.Name)));
+                }
+            }
         }
     }
 }

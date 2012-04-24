@@ -96,7 +96,7 @@ namespace ZAws
 
             //Input the project downlaod scripts
 
-            
+            /*
             if (AppsToInstall != null && AppsToInstall.Length > 0)
             {
                 StreamReader streamReader = new StreamReader("app_addscript");
@@ -122,7 +122,7 @@ namespace ZAws
                 s += StartupScript.Substring(startLoc);
                 StartupScript = s;
             }
-
+            */
             // {0} = app name and directory, for example b1
             // {1} = git repository URL, for example git@github.com:zmilojko/b1.git
             // {2} = app URL, for example b1.z-ware.fi
@@ -155,7 +155,7 @@ namespace ZAws
                     Amazon.EC2.Model.RequestSpotInstancesResponse resp2 = myController.ec2.RequestSpotInstances(req2);
 
                     NewInstanceId = resp2.RequestSpotInstancesResult.SpotInstanceRequest[0].SpotInstanceRequestId;
-                    myController.myTaskQueue.AddTask(new ZAwsTaskNewSpotRequestHandling(this.myController,resp2.RequestSpotInstancesResult.SpotInstanceRequest[0].SpotInstanceRequestId, Name));
+                    myController.myTaskQueue.AddTask(new ZAwsTaskNewSpotRequestHandling(this.myController, resp2.RequestSpotInstancesResult.SpotInstanceRequest[0].SpotInstanceRequestId, Name));
                     //myController.RememberNameForSpotInstance(NewInstanceId, Name);
                 }
                 else
@@ -199,11 +199,14 @@ namespace ZAws
 
                 if (AppsToInstall != null && AppsToInstall.Length > 0)
                 {
+                    /*
                     foreach (var appToInstall in AppsToInstall)
                     {
                         appToInstall.DeployedOnInstanceId = NewInstanceId;
                     }
                     myController.RegisterNewApps(AppsToInstall);
+                     */
+                    myController.myTaskQueue.AddTask(new ZAwsTaskInstallApps(myController, Name, AppsToInstall));
                 }
             }
             return NewInstanceId;

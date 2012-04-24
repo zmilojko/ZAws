@@ -80,9 +80,9 @@
             this.buttonAppsUpdate = new System.Windows.Forms.Button();
             this.buttonAppsRebootApache = new System.Windows.Forms.Button();
             this.buttonAppsRefresh = new System.Windows.Forms.Button();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartCPU = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartNet = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartDisk = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -91,9 +91,9 @@
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.buttonAppWWW = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartCPU)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartNet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDisk)).BeginInit();
             this.SuspendLayout();
             // 
             // textBoxName
@@ -468,30 +468,34 @@
             this.buttonAppsRefresh.Text = "Refresh";
             this.buttonAppsRefresh.UseVisualStyleBackColor = true;
             // 
-            // chart1
+            // chartCPU
             // 
+            chartArea1.AxisX.MajorGrid.Enabled = false;
+            chartArea1.AxisY.Maximum = 100D;
+            chartArea1.AxisY.Minimum = 0D;
             chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            this.chart1.Location = new System.Drawing.Point(12, 351);
-            this.chart1.Name = "chart1";
+            this.chartCPU.ChartAreas.Add(chartArea1);
+            this.chartCPU.Location = new System.Drawing.Point(12, 351);
+            this.chartCPU.Name = "chartCPU";
             series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
             series1.Name = "Series1";
+            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
             series2.Name = "Series2";
-            this.chart1.Series.Add(series1);
-            this.chart1.Series.Add(series2);
-            this.chart1.Size = new System.Drawing.Size(201, 100);
-            this.chart1.TabIndex = 33;
-            this.chart1.Text = "chart1";
+            this.chartCPU.Series.Add(series1);
+            this.chartCPU.Series.Add(series2);
+            this.chartCPU.Size = new System.Drawing.Size(201, 100);
+            this.chartCPU.TabIndex = 33;
+            this.chartCPU.Text = "chart1";
             // 
-            // chart2
+            // chartNet
             // 
             chartArea2.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea2);
-            this.chart2.Location = new System.Drawing.Point(219, 351);
-            this.chart2.Name = "chart2";
+            this.chartNet.ChartAreas.Add(chartArea2);
+            this.chartNet.Location = new System.Drawing.Point(219, 351);
+            this.chartNet.Name = "chartNet";
             series3.ChartArea = "ChartArea1";
             series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series3.Name = "Series1";
@@ -504,28 +508,28 @@
             series6.ChartArea = "ChartArea1";
             series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series6.Name = "Series4";
-            this.chart2.Series.Add(series3);
-            this.chart2.Series.Add(series4);
-            this.chart2.Series.Add(series5);
-            this.chart2.Series.Add(series6);
-            this.chart2.Size = new System.Drawing.Size(201, 100);
-            this.chart2.TabIndex = 33;
-            this.chart2.Text = "chart1";
+            this.chartNet.Series.Add(series3);
+            this.chartNet.Series.Add(series4);
+            this.chartNet.Series.Add(series5);
+            this.chartNet.Series.Add(series6);
+            this.chartNet.Size = new System.Drawing.Size(201, 100);
+            this.chartNet.TabIndex = 33;
+            this.chartNet.Text = "chart1";
             // 
-            // chart3
+            // chartDisk
             // 
             chartArea3.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea3);
-            this.chart3.Location = new System.Drawing.Point(426, 351);
-            this.chart3.Name = "chart3";
+            this.chartDisk.ChartAreas.Add(chartArea3);
+            this.chartDisk.Location = new System.Drawing.Point(426, 351);
+            this.chartDisk.Name = "chartDisk";
             series7.ChartArea = "ChartArea1";
             series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series7.MarkerSize = 10;
             series7.Name = "Series1";
-            this.chart3.Series.Add(series7);
-            this.chart3.Size = new System.Drawing.Size(166, 100);
-            this.chart3.TabIndex = 33;
-            this.chart3.Text = "chart1";
+            this.chartDisk.Series.Add(series7);
+            this.chartDisk.Size = new System.Drawing.Size(166, 100);
+            this.chartDisk.TabIndex = 33;
+            this.chartDisk.Text = "chart1";
             // 
             // label10
             // 
@@ -614,9 +618,9 @@
             this.Controls.Add(this.label12);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
-            this.Controls.Add(this.chart3);
-            this.Controls.Add(this.chart2);
-            this.Controls.Add(this.chart1);
+            this.Controls.Add(this.chartDisk);
+            this.Controls.Add(this.chartNet);
+            this.Controls.Add(this.chartCPU);
             this.Controls.Add(this.buttonAppsRefresh);
             this.Controls.Add(this.buttonAppsRebootApache);
             this.Controls.Add(this.buttonAppsUpdate);
@@ -660,9 +664,9 @@
             this.Name = "PopupEc2Properties";
             this.Text = "PopupEc2Properties";
             this.Load += new System.EventHandler(this.PopupEc2Properties_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartCPU)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartNet)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDisk)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -710,9 +714,9 @@
         private System.Windows.Forms.Button buttonAppsUpdate;
         private System.Windows.Forms.Button buttonAppsRebootApache;
         private System.Windows.Forms.Button buttonAppsRefresh;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartCPU;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartNet;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartDisk;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;

@@ -65,6 +65,7 @@ namespace ZAws
             myController = controller;
             handlerThread = new Thread(new ThreadStart(delegate
                                             {
+                                                Thread.CurrentThread.Name = "TaskHandler";
                                                 while (runner)
                                                 {
                                                     ZAwsObject currentObject = null;
@@ -88,7 +89,7 @@ namespace ZAws
                                                     if (currentObject == null)
                                                     {
                                                         //Now wait for the next object to be added
-                                                        runnerEver.WaitOne();
+                                                        runnerEver.WaitOne(3000);
                                                         continue;
                                                     }
 
@@ -189,7 +190,9 @@ namespace ZAws
 
         internal override bool WillHandle(ZAwsObject TargetObject)
         {
-            return TargetObject.GetType() == typeof(ZAwsSpotRequest) && TargetObject.Id == SpotRequestId && !string.IsNullOrWhiteSpace(((ZAwsSpotRequest)TargetObject).InstanceId);
+            return TargetObject.GetType() == typeof(ZAwsSpotRequest) 
+                && TargetObject.Id == SpotRequestId 
+                && !string.IsNullOrWhiteSpace(((ZAwsSpotRequest)TargetObject).InstanceId);
         }
 
         internal override void DoExecute(ZAwsObject TargetObject)
@@ -197,7 +200,6 @@ namespace ZAws
             MyQueue.AddTask(new ZAwsTaskHandleNewSpotRequestBasedEc2Instance((ZAwsSpotRequest)TargetObject, Ec2NewName));
         }
     }
-
     class ZAwsTaskHandleNewSpotRequestBasedEc2Instance : ZAwsTask 
     {
         ZAwsSpotRequest SpotRequest;
@@ -224,6 +226,117 @@ namespace ZAws
         internal override bool WillHandle(ZAwsObject TargetObject)
         {
             return TargetObject.GetType() == typeof(ZAwsEc2) && TargetObject.Id == SpotRequest.InstanceId && ((ZAwsEc2)TargetObject).Status == ZAwsEc2.Ec2Status.Running;
+        }
+    }
+    class ZAwsTaskInstallApps : ZAwsTask
+    {
+        string Ec2Name;
+        ZAws.ZAwsAmi.NewApp[] AppsToInstall;
+
+        public ZAwsTaskInstallApps(ZAwsEc2Controller controller, string eC2Name, ZAws.ZAwsAmi.NewApp[] appsToInstall)
+            : base(controller, "Application will be installed.")
+        {
+            Ec2Name = eC2Name;
+            AppsToInstall = appsToInstall;
+
+            StartMessage = "";
+            SuccessMessage = "";
+            ExceptionMessage = "Error installing applications, reason: {0}";
+
+            DelayBeforeTaskStart = 10;
+        }
+
+        internal override void DoExecute(ZAwsObject TargetObject)
+        {
+            if (AppsToInstall != null)
+            {
+                foreach (var app in AppsToInstall)
+                {
+                    ((ZAwsEc2)TargetObject).InstallApp(app.AppName, app.AppUrl, app.AppLocation,
+                        app.TypeIsRails ? ZAwsEc2.ApplicationType.RAILS_APP : ZAwsEc2.ApplicationType.GENERIC,
+                        app.CreateUrlRecords, app.DefaultServerApp);
+                }
+                ((ZAwsEc2)TargetObject).Reboot();
+                Thread.Sleep(5000);
+            }
+        }
+
+        internal override bool WillHandle(ZAwsObject TargetObject)
+        {
+            if (TargetObject.GetType() == typeof(ZAwsEc2) && TargetObject.Name == Ec2Name && ((ZAwsEc2)TargetObject).Status == ZAwsEc2.Ec2Status.Running)
+            {
+                try
+                {
+                    ((ZAwsEc2)TargetObject).SshClient.SendLine("echo \"Testing if SSH is ready.\"");
+                    return true;
+                }
+                catch
+                {
+                    Program.TraceLine("Fail, will try again very soon.");
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    class ZAwsTaskAssociateNewIpToEc2 : ZAwsTask
+    {
+        ZAwsEc2 Ec2;
+
+        public ZAwsTaskAssociateNewIpToEc2(ZAwsEc2 ec2)
+            : base(ec2.myController, "Application will be installed.")
+        {
+            Ec2 = ec2;
+
+            StartMessage = "Associating new IP with EC2 " + ec2.Name;
+            SuccessMessage = "Succefully associated new IP with EC2 " + ec2.Name;
+            ExceptionMessage = "Error associating IP, reason: {0}";
+
+            DelayBeforeTaskStart = 1;
+        }
+
+        internal override void DoExecute(ZAwsObject TargetObject)
+        {
+            ((ZAwsElasticIp)TargetObject).Associate(Ec2);
+        }
+
+        internal override bool WillHandle(ZAwsObject TargetObject)
+        {
+            return TargetObject.GetType() == typeof(ZAwsElasticIp) && !((ZAwsElasticIp)TargetObject).Associated && Ec2.Status == ZAwsEc2.Ec2Status.Running;
+        }
+    }
+    class ZAwsTaskPointARecordToEc2 : ZAwsTask
+    {
+        ZAwsEc2 Ec2;
+        string Url;
+
+        public ZAwsTaskPointARecordToEc2(ZAwsEc2 ec2, string url)
+            : base(ec2.myController, "Application will be installed.")
+        {
+            Ec2 = ec2;
+            Url = url;
+
+            StartMessage = "Creating new A record for " + Url;
+            SuccessMessage = "Succefully created A record.";
+            ExceptionMessage = "Error creating A record, reason: {0}";
+
+            DelayBeforeTaskStart = 1;
+        }
+
+        internal override void DoExecute(ZAwsObject TargetObject)
+        {
+            Ec2.PointUrl(Url);
+        }
+
+        internal override bool WillHandle(ZAwsObject TargetObject)
+        {
+            return TargetObject.GetType() == typeof(ZAwsEc2) 
+                && ((ZAwsEc2)TargetObject).Id == Ec2.Id 
+                && ((ZAwsEc2)TargetObject).AssociatedIP != null
+                && ((ZAwsEc2)TargetObject).Status == ZAwsEc2.Ec2Status.Running;
         }
     }
 }

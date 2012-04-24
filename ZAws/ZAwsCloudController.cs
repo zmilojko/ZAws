@@ -165,7 +165,7 @@ namespace ZAws
                 {
                     RunMonitoring = false;
                 }
-                if (!MonitoringThread.Join(5000))
+                if (!MonitoringThread.Join(10000))
                 {
                     MonitoringThread.Abort();
                     killedTheThread = true;
@@ -198,6 +198,7 @@ namespace ZAws
         #region Monitor query functions
         void MonitorFunction()
         {
+            Thread.CurrentThread.Name = "MonitorThread";
             Program.TraceLine("Monitoring thread started...");
             Program.MonitorMessage = "Monitor starting...";
             while (true)

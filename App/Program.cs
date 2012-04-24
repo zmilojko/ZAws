@@ -78,6 +78,7 @@ namespace ZAws.Console
         [STAThread]
         public static void Main(string[] args)
         {
+            Thread.CurrentThread.Name = "Main UI Thread";
             Stream TraceListenerStream = new FileStream(@"c:\zawscc.log", FileMode.Append, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite | FileShare.Inheritable);
             Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(TraceListenerStream));
             Trace.AutoFlush = true;
