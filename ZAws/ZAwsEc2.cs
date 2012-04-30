@@ -255,20 +255,53 @@ namespace ZAws
 
         DateTime timeSpanRequired = DateTime.Now - TimeSpan.FromDays(1);
 
-        /// <summary>
-        /// Indicates the first timestamp required.
-        /// </summary>
-        public DateTime TimeSpanRequired
+        DateTime monitoringSegmentEnd;
+        bool monitoringSegmentEndSet = false;
+        TimeSpan MonitoringSpan = TimeSpan.FromDays(1);
+
+        public DateTime MonitoringSegmentStart
+        {
+            get
+            {
+                return MonitoringSegmentEnd - MonitoringSpan;
+            }
+        }
+
+        int Period
+        {
+            get
+            {
+                return Math.Min((int)(MonitoringSpan.TotalSeconds / 288), 300);
+            }
+        }
+
+        public DateTime MonitoringSegmentEnd
         {
             set
             {
-                timeSpanRequired = value;
+                if (DateTime.Now - value < TimeSpan.FromHours(1))
+                {
+                    monitoringSegmentEndSet = false;
+                }
+                else
+                {
+                    monitoringSegmentEndSet = true;
+                    monitoringSegmentEnd = value;
+                }
             }
             get
             {
-                return timeSpanRequired;
+                if (monitoringSegmentEndSet)
+                {
+                    return monitoringSegmentEnd;
+                }
+                else
+                {
+                    return DateTime.Now;
+                }
             }
         }
+
 
         internal void UpdateInfo()
         {
@@ -277,7 +310,7 @@ namespace ZAws
             if (this.Status == Ec2Status.Running)
             {
                 //this will give us 5 minute interval on 1 day 
-                int period = Math.Min((int)((DateTime.Now - TimeSpanRequired).TotalSeconds / 288), 300);
+                
 
                 var resp2 = myController.CloudWatch.GetMetricStatistics(new GetMetricStatisticsRequest()
                                                                     .WithNamespace("AWS/EC2")
@@ -286,9 +319,9 @@ namespace ZAws
                                                                                                 .WithName("InstanceId")
                                                                                                 .WithValue(this.InstanceId))
 
-                                                                    .WithStartTime(TimeSpanRequired.ToUniversalTime())
-                                                                    .WithEndTime(DateTime.Now.ToUniversalTime())
-                                                                    .WithPeriod(period)
+                                                                    .WithStartTime(MonitoringSegmentStart.ToUniversalTime())
+                                                                    .WithEndTime(MonitoringSegmentEnd.ToUniversalTime())
+                                                                    .WithPeriod(Period)
                                                                     .WithMetricName("CPUUtilization")
                                                                     .WithUnit("Percent")
                                                                     .WithStatistics("Average", "Maximum"));
@@ -335,9 +368,9 @@ namespace ZAws
                                                                                                 .WithName("InstanceId")
                                                                                                 .WithValue(this.InstanceId))
 
-                                                                    .WithStartTime(TimeSpanRequired.ToUniversalTime())
-                                                                    .WithEndTime(DateTime.Now.ToUniversalTime())
-                                                                    .WithPeriod(period)
+                                                                    .WithStartTime(MonitoringSegmentStart.ToUniversalTime())
+                                                                    .WithEndTime(MonitoringSegmentEnd.ToUniversalTime())
+                                                                    .WithPeriod(Period)
                                                                     .WithMetricName("NetworkOut")
                                                                     .WithUnit("Bytes")
                                                                     .WithStatistics("Sum"));

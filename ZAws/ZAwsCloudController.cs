@@ -184,6 +184,7 @@ namespace ZAws
                 CloudWatch.Dispose();
                 CloudWatch = null;
 
+
                 if (killedTheThread)
                 {
                     throw new ZAwsException("Connection failure, could not close connection gracefully. Might require restart.");
@@ -239,10 +240,13 @@ namespace ZAws
                         Program.MonitorMessage = "Updated zone " + zone.Name;
                     }
 
+                    /*
+                     * We will not be checking S3 service, because that actually costs money!
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     ListBucketsResponse s3Buckects = GetBuckets();
                     UpdateClassOfObjects(currentS3Buckets, s3Buckects.Buckets);
                     Program.MonitorMessage = "Updated S3 Buckets...";
+                     * */
 
                     lock (Ec2Lock) { if (!RunMonitoring) { return; } }
                     DescribeSnapshotsResponse respEc2Snapshots = GetSnapshots();

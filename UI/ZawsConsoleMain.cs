@@ -46,6 +46,8 @@ namespace ZAws.Console
 
         private void MainView_Load(object sender, EventArgs e)
         {
+            this.Text += " (" + Application.ProductVersion + ")";
+
             MainView_Resize(null, null);
             //awsListView.Items.Add("Please wait until ZAws Console connects to the AWS servers...");
             controller.NewObject += new EventHandler<ZAwsEc2Controller.ZAwsNewObjectEventArgs>(controller_NewObject);
@@ -159,6 +161,10 @@ namespace ZAws.Console
         {
             if (this.InvokeRequired)
             {
+                if (Closing)
+                {
+                    return new ItemsAndBounds[0];
+                }
                 return (ItemsAndBounds[])this.Invoke(new MyCurrentObjectsInListDelegate(this.MyCurrentObjectsInList));
             }
 
@@ -239,9 +245,10 @@ namespace ZAws.Console
             
             textBox1.Text = msg;
         }
-
+        bool Closing = false;
         private void MainView_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Closing = true;
             controller.Disconnect();
         }
 
