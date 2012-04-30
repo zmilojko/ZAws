@@ -11,6 +11,12 @@
     <add key="Ec2InitKnownHosts" value="C:\Users\YOUR_USERNAME_HERE\.ssh\known_hosts_for_ec2"/>
     <add key="Ec2InitDefaultSshPrivateKey" value="C:\Users\YOUR_USERNAME_HERE\.ssh\git_ec2"/>
     <add key="Ec2InitDefaultSshPublicKey" value="C:\Users\YOUR_USERNAME_HERE\.ssh\git_ec2.pub"/>
+    <add key="MySqlAdminApp" value="C:\Program Files (x86)\MySQL\MySQL Tools for 5.0\MySQLAdministrator.exe"/>
+    <add key="MySqlAdminArgs" value="-h{PublicDNS} -u{0} -p{1}"/>
+    <add key="MySqlBrowserApp" value="C:\Program Files (x86)\MySQL\MySQL Tools for 5.0\MySQLQueryBrowser.exe"/>
+    <add key="MySqlBrowserArgs" value="-h{PublicDNS} -u{0} -p{1}"/>
+    <add key="MySqlUsername" value="YOUR DB ADMIN USERNAME"/>
+    <add key="MySqlPassword" value="YOUR_DB ADMIN PASSWORD"/>
   </appSettings>
   <startup>
     <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0"/>
