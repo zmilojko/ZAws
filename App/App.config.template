@@ -5,9 +5,9 @@
 		<add key="AWSSecretKey" value="YOUR_SECRET_KEY_HERE"/>
     <add key="SSHPrivateKeysDir" value="C:\Users\YOUR_USERNAME_HERE\.ssh\"/>
     <add key="SSHTerminalApp" value="C:\Program Files (x86)\PuTTY\putty.exe"/>
-    <add key="SSHTerminaAppArgs" value="-ssh -i {1} ec2-user@{0}"/>
+    <add key="SSHTerminaAppArgs" value="-ssh -i {PublicKeyFile}.ppk ec2-user@{PublicDNS}"/>
     <add key="SSHFileBrowserApp" value="C:\Program Files (x86)\WinSCP\WinSCP.exe"/>
-    <add key="SSHFileBrowserAppArgs" value="/privatekey={1}   ec2-user@{0}"/>
+    <add key="SSHFileBrowserAppArgs" value="/privatekey={PublicKeyFile}.ppk   ec2-user@{PublicDNS}"/>
     <add key="Ec2InitKnownHosts" value="C:\Users\YOUR_USERNAME_HERE\.ssh\known_hosts_for_ec2"/>
     <add key="Ec2InitDefaultSshPrivateKey" value="C:\Users\YOUR_USERNAME_HERE\.ssh\git_ec2"/>
     <add key="Ec2InitDefaultSshPublicKey" value="C:\Users\YOUR_USERNAME_HERE\.ssh\git_ec2.pub"/>
