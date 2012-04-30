@@ -32,8 +32,8 @@ namespace ZAws.Console
             buttonReboot.Click += Do.HandleInZawsUi(buttonReboot_Click, "Successfully sent Reboot EC2 command.", "Error while sending EC2 reboot command, reason: {0}");
             buttonChangeName.Click += Do.HandleInZawsUi(buttonChangeName_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
 
-            buttonMysqlAdmin.Click += Do.HandleInZawsUi(buttonMysqlAdmin_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
-            buttonMysqlBrowser.Click += Do.HandleInZawsUi(buttonMysqlBrowser_Click, "Successfully changed EC2 name.", "Error while changing EC2 name, reason: {0}");
+            buttonMysqlAdmin.Click += Do.HandleInZawsUi(buttonMysqlAdmin_Click, "Successfully started MySQL Admin.", "Error starting MySQL Admin, reason: {0}");
+            buttonMysqlBrowser.Click += Do.HandleInZawsUi(buttonMysqlBrowser_Click, "Successfully started MySQL Browser.", "Error starting MySQL Browser, reason: {0}");
 
             buttonAppsRefresh.Click += Do.HandleInZawsUi(buttonAppsRefresh_Click, "Apps info retrieved.", "Error while checking installed apps, reason: {0}");
             buttonAppsUpdate.Click += Do.HandleInZawsUi(buttonAppsUpdate_Click, "Selected apps updated from repositories. NOTE: You might have to perform additional steps and/or restart the web server for changes to take effect.", "Error updating selected apps, reason: {0}");
