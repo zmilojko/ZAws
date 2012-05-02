@@ -51,6 +51,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonWWW = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.buttonShowMoney = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -280,9 +281,19 @@
             this.textBox1.Location = new System.Drawing.Point(557, 502);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(74, 37);
+            this.textBox1.Size = new System.Drawing.Size(74, 27);
             this.textBox1.TabIndex = 10;
             this.textBox1.Text = "Monitoring not started";
+            // 
+            // buttonShowMoney
+            // 
+            this.buttonShowMoney.Location = new System.Drawing.Point(557, 535);
+            this.buttonShowMoney.Name = "buttonShowMoney";
+            this.buttonShowMoney.Size = new System.Drawing.Size(26, 23);
+            this.buttonShowMoney.TabIndex = 11;
+            this.buttonShowMoney.Text = "$";
+            this.buttonShowMoney.UseVisualStyleBackColor = true;
+            this.buttonShowMoney.Click += new System.EventHandler(this.buttonShowMoney_Click);
             // 
             // MainView
             // 
@@ -290,6 +301,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(719, 566);
+            this.Controls.Add(this.buttonShowMoney);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.buttonWWW);
             this.Controls.Add(this.pictureBox1);
@@ -353,5 +365,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button buttonWWW;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button buttonShowMoney;
     }
 }

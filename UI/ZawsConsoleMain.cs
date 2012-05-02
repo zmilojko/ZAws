@@ -245,7 +245,7 @@ namespace ZAws.Console
             
             textBox1.Text = msg;
         }
-        bool Closing = false;
+        new bool Closing = false;
         private void MainView_FormClosed(object sender, FormClosedEventArgs e)
         {
             Closing = true;
@@ -730,6 +730,12 @@ namespace ZAws.Console
                 }
                 return;
             }
+        }
+
+        private void buttonShowMoney_Click(object sender, EventArgs e)
+        {
+            Program.OpenWebBrowser("https://aws-portal.amazon.com/gp/aws/developer/account/index.html?ie=UTF8&action=activity-summary");
+            //https://aws-portal.amazon.com/gp/aws/developer/account/index.html?ie=UTF8&action=activity-summary
         }
     }
 }
