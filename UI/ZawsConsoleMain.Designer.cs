@@ -46,12 +46,12 @@
             this.buttonBucketFileBrowser = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.awsListView = new ZAws.Console.ZawsListView();
             this.textBoxTrace = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonWWW = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.buttonShowMoney = new System.Windows.Forms.Button();
+            this.awsListView = new ZAws.Console.ZawsListView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -227,21 +227,6 @@
             this.splitContainer.SplitterDistance = 258;
             this.splitContainer.TabIndex = 7;
             // 
-            // awsListView
-            // 
-            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.awsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.awsListView.Location = new System.Drawing.Point(0, 0);
-            this.awsListView.Name = "awsListView";
-            this.awsListView.OwnerDraw = true;
-            this.awsListView.Size = new System.Drawing.Size(371, 258);
-            this.awsListView.TabIndex = 0;
-            this.awsListView.UseCompatibleStateImageBehavior = false;
-            this.awsListView.View = System.Windows.Forms.View.Tile;
-            this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
-            this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
-            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
-            // 
             // textBoxTrace
             // 
             this.textBoxTrace.BackColor = System.Drawing.Color.White;
@@ -294,6 +279,22 @@
             this.buttonShowMoney.Text = "$";
             this.buttonShowMoney.UseVisualStyleBackColor = true;
             this.buttonShowMoney.Click += new System.EventHandler(this.buttonShowMoney_Click);
+            // 
+            // awsListView
+            // 
+            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.awsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.awsListView.FullRowSelect = true;
+            this.awsListView.Location = new System.Drawing.Point(0, 0);
+            this.awsListView.Name = "awsListView";
+            this.awsListView.OwnerDraw = true;
+            this.awsListView.Size = new System.Drawing.Size(371, 258);
+            this.awsListView.TabIndex = 0;
+            this.awsListView.UseCompatibleStateImageBehavior = false;
+            this.awsListView.View = System.Windows.Forms.View.Tile;
+            this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
+            this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
+            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
             // 
             // MainView
             // 

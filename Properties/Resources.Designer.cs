@@ -96,8 +96,8 @@ namespace ZAws.Properties {
         /// <summary>
         ///   Looks up a localized string similar to echo &quot;&lt;VirtualHost *:80&gt;
         ///    ServerName {1}
-        ///    DocumentRoot /var/rails_apps/{0}{2}
-        ///    &lt;Directory /var/rails_apps/{0}{2}&gt;
+        ///    DocumentRoot /var/{4}/{0}{2}
+        ///    &lt;Directory /var/{4}/{0}{2}&gt;
         ///       AllowOverride all
         ///       Options -MultiViews
         ///    &lt;/Directory&gt;

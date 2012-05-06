@@ -673,7 +673,8 @@ namespace ZAws
             Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
 
             string config_text = string.Format(ZAws.Properties.Resources.ConfigText, name, url,
-                applicationType == ApplicationType.GENERIC ? "" : "/public", defaultApp ? "_" : "");
+                applicationType == ApplicationType.GENERIC ? "" : "/public", defaultApp ? "_" : "",
+                applicationType == ApplicationType.GENERIC ? "web_apps" : "rails_apps");
             this.SshClient.SendLine(config_text, true);
             Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
 
