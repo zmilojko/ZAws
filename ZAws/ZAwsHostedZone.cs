@@ -44,6 +44,14 @@ namespace ZAws
             }
         }
 
+        public override string Id
+        {
+            get
+            {
+                return ResponseData.Id;
+            }
+        }
+
         protected override bool DoUpdate(object responseData)
         {
             Debug.Assert(responseData.GetType() == typeof(HostedZone), "Wrong data passed to the object for update.");
@@ -54,7 +62,7 @@ namespace ZAws
         internal override bool EqualsData(object responseData)
         {
             Debug.Assert(responseData.GetType() == typeof(HostedZone), "Wrong data passed to the object for update.");
-            return string.Equals(Name, ((HostedZone)responseData).Name);
+            return string.Equals(Id, ((HostedZone)responseData).Id);
         }
 
         protected override void DoDeleteObject()
