@@ -57,7 +57,6 @@
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonStop = new System.Windows.Forms.Button();
             this.buttonReboot = new System.Windows.Forms.Button();
-            this.buttonTerminate = new System.Windows.Forms.Button();
             this.buttonTerminal = new System.Windows.Forms.Button();
             this.buttonFileBrowser = new System.Windows.Forms.Button();
             this.buttonRunScript = new System.Windows.Forms.Button();
@@ -294,15 +293,6 @@
             this.buttonReboot.TabIndex = 23;
             this.buttonReboot.Text = "Reboot";
             this.buttonReboot.UseVisualStyleBackColor = true;
-            // 
-            // buttonTerminate
-            // 
-            this.buttonTerminate.Location = new System.Drawing.Point(501, 99);
-            this.buttonTerminate.Name = "buttonTerminate";
-            this.buttonTerminate.Size = new System.Drawing.Size(91, 23);
-            this.buttonTerminate.TabIndex = 24;
-            this.buttonTerminate.Text = "Terminate";
-            this.buttonTerminate.UseVisualStyleBackColor = true;
             // 
             // buttonTerminal
             // 
@@ -601,7 +591,6 @@
             this.Controls.Add(this.buttonMysqlAdmin);
             this.Controls.Add(this.buttonFileBrowser);
             this.Controls.Add(this.buttonTerminal);
-            this.Controls.Add(this.buttonTerminate);
             this.Controls.Add(this.buttonReboot);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.buttonStart);
@@ -664,7 +653,6 @@
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonStop;
         private System.Windows.Forms.Button buttonReboot;
-        private System.Windows.Forms.Button buttonTerminate;
         private System.Windows.Forms.Button buttonTerminal;
         private System.Windows.Forms.Button buttonFileBrowser;
         private System.Windows.Forms.Button buttonRunScript;

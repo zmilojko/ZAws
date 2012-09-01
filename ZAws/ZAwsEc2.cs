@@ -50,20 +50,24 @@ namespace ZAws
 
         //int ConfigureAppsWhenBootingComplete = 0;
 
+        public string GetTagValue(string tagName)
+        {
+            foreach (Amazon.EC2.Model.Tag t in Reservation.RunningInstance[0].Tag)
+            {
+                if (t.Key.ToLower() == tagName.ToLower())
+                {
+                    return t.Value;
+                }
+            }
+            return null;
+        }
+
+
         public override string Name
         {
             get
             {
-                //find the instance name among the tags
-                string InstanceName = "not set";
-                foreach (Amazon.EC2.Model.Tag t in Reservation.RunningInstance[0].Tag)
-                {
-                    if (t.Key.ToLower() == "name")
-                    {
-                        InstanceName = t.Value;
-                    }
-                }
-                return InstanceName;
+                return string.IsNullOrWhiteSpace(GetTagValue("name")) ? "not set" : GetTagValue("name");
             }
         }
 
@@ -134,19 +138,45 @@ namespace ZAws
                     .WithInstanceId(InstanceId));
         }
 
+        enum ProductionOptions
+        {
+            NonStop = 1,
+            DoNotDestroy = 2,
+        }
+
+
+        void CheckProtected(ProductionOptions options)
+        {
+            foreach(ProductionOptions possible_option in Enum.GetValues(typeof(ProductionOptions)))
+            {
+                if((possible_option & options) != 0)
+                {
+                    if(GetTagValue("production") != null && GetTagValue("production").ToLower().Contains(possible_option.ToString().ToLower()))
+                    {
+                        throw new Exception("This instance is protected from the operation you are trying to perform. Use web console to remove the following Production option: " + possible_option.ToString());
+                    }
+                }
+            }
+        }
+
         internal void Stop()
         {
+            CheckProtected(ProductionOptions.NonStop);
             StopInstancesResponse resp = myController.ec2.StopInstances(new StopInstancesRequest()
                     .WithInstanceId(InstanceId));
         }
         internal void Reboot()
         {
+            CheckProtected(ProductionOptions.NonStop);
+
             RebootInstancesResponse resp = myController.ec2.RebootInstances(new RebootInstancesRequest()
                     .WithInstanceId(InstanceId));
         }
 
         protected override void DoDeleteObject()
         {
+            CheckProtected(ProductionOptions.NonStop | ProductionOptions.DoNotDestroy);
+
             if (Status != Ec2Status.Terminated)
             {
                 TerminateInstancesResponse resp = myController.ec2.TerminateInstances(new TerminateInstancesRequest()
@@ -511,7 +541,7 @@ namespace ZAws
         {
             get
             {
-                if (sshClient == null)
+                if (sshClient == null || !sshClient.IsOpen)
                 {
                     Program.TraceLine("Opening SSH interface to {0}", this.Reservation.RunningInstance[0].PublicDnsName);
                     sshClient = new ZawsSshClient(this.Reservation.RunningInstance[0].PublicDnsName, "ec2-user", "", PrivateKeyFile + ".ssh2");
@@ -665,7 +695,11 @@ namespace ZAws
             Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
 
             //Step 2: Execute README bash script            
-            this.SshClient.SendLine("bash STARTME", true);
+            this.SshClient.SendLine("bash STARTME", true, 5*60000);
+            Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
+
+            //Following is to make sure we receive a prompt after BASH has completed
+            this.SshClient.SendLine("", true);
             Program.Tracer.TraceLine(false, "ssh>" + (resp = this.SshClient.GetResponse()).Replace("\n", "\nssh>"));
 
             //Step 3: Create virtual host

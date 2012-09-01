@@ -55,6 +55,7 @@ namespace ZAws
             }
         }
 
+        //This should be called only by the Controller when the object is noticed not to be there anymore - so the deletion is complete.
         internal virtual void Delete()
         {
             TriggerObjectDeleted();
@@ -71,6 +72,7 @@ namespace ZAws
         protected abstract void DoDeleteObject();
         internal abstract bool EqualsData(Object responseData);
 
+        //This is called when the object should be deleted
         public void DeleteObject()
         {
             DoDeleteObject();

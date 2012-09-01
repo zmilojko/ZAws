@@ -44,6 +44,7 @@ namespace ZAws
         }
         Reader reader;
         SSHConnection _conn;
+        bool isOpen = false;
 
         public class ReceivedStringEventArgs : EventArgs
         {
@@ -151,6 +152,16 @@ namespace ZAws
                 //prompt not received
                 throw new Exception("Connected to the target OK, but have not received the clear command prompt ($ or #).");
             }
+
+            isOpen = true;
+        }
+
+        public bool IsOpen
+        {
+            get
+            {
+                return isOpen;
+            }
         }
 
         EventWaitHandle eReadyToRoll = new EventWaitHandle(false, EventResetMode.ManualReset);
@@ -188,8 +199,16 @@ namespace ZAws
             }
 
             s += "\n";
-            reader._pf.Transmit(Encoding.ASCII.GetBytes(s), 0, s.Length);
 
+            try
+            {
+                reader._pf.Transmit(Encoding.ASCII.GetBytes(s), 0, s.Length);
+            }
+            catch
+            {
+                Close();
+                throw;
+            }
             if (waitResponse)
             {
                 return eReadyToRoll.WaitOne(timeoutMiliseconds);

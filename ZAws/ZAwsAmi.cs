@@ -150,6 +150,7 @@ namespace ZAws
                             .WithInstanceType(InstanceSize)
                             .WithKeyName(KeyPair.Name)
                             .WithSecurityGroupId(SecGroup.ResponseData.GroupId)
+                            .WithPlacement(new Amazon.EC2.Model.Placement().WithAvailabilityZone("eu-west-1a"))
                             .WithUserData(Convert.ToBase64String(Encoding.UTF8.GetBytes(StartupScript.Replace("\r", "")))));
 
                     Amazon.EC2.Model.RequestSpotInstancesResponse resp2 = myController.ec2.RequestSpotInstances(req2);
@@ -167,6 +168,7 @@ namespace ZAws
                       .WithSecurityGroupId(SecGroup.ResponseData.GroupId)
                       .WithMinCount(1)
                       .WithMaxCount(1)
+                      .WithPlacement(new Amazon.EC2.Model.Placement().WithAvailabilityZone("eu-west-1a"))
                       .WithUserData(Convert.ToBase64String(Encoding.UTF8.GetBytes(StartupScript.Replace("\r", ""))));
 
                     Amazon.EC2.Model.RunInstancesResponse response = myController.ec2.RunInstances(req);
