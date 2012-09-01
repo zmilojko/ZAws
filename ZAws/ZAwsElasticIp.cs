@@ -71,6 +71,27 @@ namespace ZAws
 
         protected override void DoDeleteObject()
         {
+            //Check if associated
+            if (Associated)
+            {
+                throw new Exception("Cannot delete IP when associated. Disassociate first.");
+            }
+
+            foreach (ZAwsHostedZone zone in myController.CurrentHostedZones)
+            {
+                foreach (var r in zone.currentRecordSet)
+                {
+                    foreach (var t in r.ResourceRecords)
+                    {
+                        if (t.Value.Contains(this.Name))
+                        {
+                            throw new Exception("This IP features in a record of the hosted zone " + zone.Name + ". Remove that record first. ");
+                        }
+                    }
+                }
+            }
+
+
             Amazon.EC2.Model.ReleaseAddressResponse resp = myController.ec2.ReleaseAddress(new Amazon.EC2.Model.ReleaseAddressRequest()
                                                                     .WithPublicIp(this.ResponseData.PublicIp));
         }

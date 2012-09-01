@@ -38,6 +38,7 @@ namespace ZAws.Console
             buttonAppsRefresh.Click += Do.HandleInZawsUi(buttonAppsRefresh_Click, "Apps info retrieved.", "Error while checking installed apps, reason: {0}");
             buttonAppsUpdate.Click += Do.HandleInZawsUi(buttonAppsUpdate_Click, "Selected apps updated from repositories. NOTE: You might have to perform additional steps and/or restart the web server for changes to take effect.", "Error updating selected apps, reason: {0}");
             buttonAppsRebootApache.Click += Do.HandleInZawsUi(buttonAppsRebootApache_Click, "Apache restarted.", "Problem restarting apache, reason: {0}");
+            buttonAppWWW.Click += new EventHandler(buttonAppWWW_Click);
 
             MyEC2.StatusChanged += new EventHandler(MyEC2_StatusChanged);
             MyEC2.ObjectDeleted += new EventHandler(MyEC2_ObjectDeleted);
@@ -291,6 +292,18 @@ namespace ZAws.Console
         private void buttonMonitor_Click(object sender, EventArgs e)
         {
 
+        }
+
+        void buttonAppWWW_Click(object sender, EventArgs e)
+        {
+            if (MyEC2.Status == ZAwsEc2.Ec2Status.Running && listViewApps.SelectedItems.Count > 0)
+            {
+                foreach (ListViewItem item in listViewApps.SelectedItems)
+                {
+                    ZAwsEc2.Application app = (ZAwsEc2.Application)item.Tag;
+                    Program.OpenWebBrowser("http://" + app.URL);
+                }
+            }
         }
 
         private void listViewApps_SelectedIndexChanged(object sender, EventArgs e)

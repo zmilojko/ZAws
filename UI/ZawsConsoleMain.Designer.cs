@@ -46,11 +46,12 @@
             this.buttonBucketFileBrowser = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.awsListView = new ZAws.Console.ZawsListView();
             this.textBoxTrace = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonWWW = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.buttonShowMoney = new System.Windows.Forms.Button();
+            this.awsListView = new ZAws.Console.ZawsListView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -226,21 +227,6 @@
             this.splitContainer.SplitterDistance = 258;
             this.splitContainer.TabIndex = 7;
             // 
-            // awsListView
-            // 
-            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.awsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.awsListView.Location = new System.Drawing.Point(0, 0);
-            this.awsListView.Name = "awsListView";
-            this.awsListView.OwnerDraw = true;
-            this.awsListView.Size = new System.Drawing.Size(371, 258);
-            this.awsListView.TabIndex = 0;
-            this.awsListView.UseCompatibleStateImageBehavior = false;
-            this.awsListView.View = System.Windows.Forms.View.Tile;
-            this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
-            this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
-            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
-            // 
             // textBoxTrace
             // 
             this.textBoxTrace.BackColor = System.Drawing.Color.White;
@@ -280,9 +266,35 @@
             this.textBox1.Location = new System.Drawing.Point(557, 502);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(74, 37);
+            this.textBox1.Size = new System.Drawing.Size(74, 27);
             this.textBox1.TabIndex = 10;
             this.textBox1.Text = "Monitoring not started";
+            // 
+            // buttonShowMoney
+            // 
+            this.buttonShowMoney.Location = new System.Drawing.Point(557, 535);
+            this.buttonShowMoney.Name = "buttonShowMoney";
+            this.buttonShowMoney.Size = new System.Drawing.Size(26, 23);
+            this.buttonShowMoney.TabIndex = 11;
+            this.buttonShowMoney.Text = "$";
+            this.buttonShowMoney.UseVisualStyleBackColor = true;
+            this.buttonShowMoney.Click += new System.EventHandler(this.buttonShowMoney_Click);
+            // 
+            // awsListView
+            // 
+            this.awsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.awsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.awsListView.FullRowSelect = true;
+            this.awsListView.Location = new System.Drawing.Point(0, 0);
+            this.awsListView.Name = "awsListView";
+            this.awsListView.OwnerDraw = true;
+            this.awsListView.Size = new System.Drawing.Size(371, 258);
+            this.awsListView.TabIndex = 0;
+            this.awsListView.UseCompatibleStateImageBehavior = false;
+            this.awsListView.View = System.Windows.Forms.View.Tile;
+            this.awsListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.awsListView_DrawItem);
+            this.awsListView.SelectedIndexChanged += new System.EventHandler(this.awsListView_SelectedIndexChanged);
+            this.awsListView.DoubleClick += new System.EventHandler(this.awsListView_DoubleClick);
             // 
             // MainView
             // 
@@ -290,6 +302,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(719, 566);
+            this.Controls.Add(this.buttonShowMoney);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.buttonWWW);
             this.Controls.Add(this.pictureBox1);
@@ -353,5 +366,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button buttonWWW;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button buttonShowMoney;
     }
 }
